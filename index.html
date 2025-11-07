@@ -11,6 +11,7 @@
       grid-template-columns: 200px 1fr 250px;
       height: 100vh;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
 
     /* 左側選單區 */
@@ -29,28 +30,27 @@
 
     /* 中間主內容 */
     main {
-      padding: 0;
-      border: none;
       position: relative;
-      overflow: hidden; /* 關鍵：隱藏多餘內容 */
+      overflow: hidden;
     }
 
-    /* 裁切容器 */
+    /* iframe 容器 */
     .frame-wrap {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      overflow: hidden; /* 關鍵：裁切內容 */
+      overflow: hidden;
+      border: none;
     }
 
     /* iframe 本體 */
     .frame-inner {
-      width: 140%;
-      height: 8000px; /* 要比容器高 */
+      width: 4000px; /* 若有橫向移動需放大 */
+      height: 4000px;
       border: none;
+      transform-origin: 0 0;
       display: block;
-      transform-origin: 0 0; /* 以左上角為位移基準 */
     }
 
     /* 右側廣告區 */
@@ -67,6 +67,26 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    /* 控制面板 */
+    .panel {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      z-index: 9999;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .panel label { display:block; margin-top:5px; }
+    .panel input[type="range"] { width:100%; }
   </style>
 </head>
 <body>
@@ -78,11 +98,23 @@
   </nav>
 
   <main id="main">
-    <!-- 裁切容器（固定高度 2000px）-->
+    <!-- 裁切容器 -->
     <div class="frame-wrap" id="frameWrap" style="height:2000px;">
       <iframe id="theFrame" class="frame-inner"
         src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
-        title="蚤來蚤趣" scrolling="no"></iframe>
+        title="嘉隆商品區" scrolling="no"></iframe>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="panel">
+      <label>水平位置 (TX)：<span id="txVal"></span></label>
+      <input id="txRange" type="range" min="-3500" max="-201" value="-201" step="10">
+
+      <label>垂直位置 (TY)：<span id="tyVal"></span></label>
+      <input id="tyRange" type="range" min="-1000" max="0" value="-438" step="10">
+
+      <label>可視高度 (VH)：<span id="vhVal"></span></label>
+      <input id="vhRange" type="range" min="500" max="3000" value="2000" step="10">
     </div>
   </main>
 
@@ -94,20 +126,39 @@
   </aside>
 
   <script>
-    // 固定裁切位置設定
-    const tx = -201;   // 水平位移 px
-    const ty = -438;   // 垂直位移 px
-    const vh = 4000;   // 顯示高度 px
+    // 初始值與範圍
+    const txStart = -201, txEnd = -3500;
+    const tyStart = -438, tyEnd = -1000;
+    const vhMin = 500, vhMax = 3000;
 
     const frameWrap = document.getElementById('frameWrap');
     const theFrame = document.getElementById('theFrame');
 
-    // 套用設定
-    frameWrap.style.height = vh + 'px';
-    theFrame.style.transform = 'translate(' + tx + 'px, ' + ty + 'px)';
+    const txRange = document.getElementById('txRange');
+    const tyRange = document.getElementById('tyRange');
+    const vhRange = document.getElementById('vhRange');
+
+    const txVal = document.getElementById('txVal');
+    const tyVal = document.getElementById('tyVal');
+    const vhVal = document.getElementById('vhVal');
+
+    function updateView() {
+      const tx = parseInt(txRange.value);
+      const ty = parseInt(tyRange.value);
+      const vh = parseInt(vhRange.value);
+
+      txVal.textContent = tx + 'px';
+      tyVal.textContent = ty + 'px';
+      vhVal.textContent = vh + 'px';
+
+      frameWrap.style.height = vh + 'px';
+      theFrame.style.transform = `translate(${tx}px, ${ty}px)`;
+    }
+
+    [txRange, tyRange, vhRange].forEach(r => r.addEventListener('input', updateView));
+
+    // 初始化顯示
+    updateView();
   </script>
 </body>
 </html>
-
-
-
