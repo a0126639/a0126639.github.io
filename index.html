@@ -72,6 +72,21 @@
   </div>
 </main>
 
+
+  <script>
+  // 固定裁切位置設定
+  const tx = -201;   // 水平位移 px
+  const ty = -438;   // 垂直位移 px
+  const vh = 2000;   // 顯示高度 px
+
+  const frameWrap = document.getElementById('frameWrap');
+  const theFrame = document.getElementById('theFrame');
+
+  // 套用設定
+  frameWrap.style.height = vh + 'px';
+  theFrame.style.transform = 'translate(' + tx + 'px, ' + ty + 'px)';
+</script>
+
   <aside>
     <h3>廣告區</h3>
     <div class="ad-box">這裡可以放你的廣告 1</div>
@@ -80,5 +95,6 @@
   </aside>
 </body>
 </html>
+
 
 
