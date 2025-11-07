@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>蚤激安寄賣小舖</title>
+
+  <!-- ✅ 所有 CSS 都放在這裡 -->
   <style>
     body {
       margin: 0;
@@ -34,7 +36,7 @@
       overflow: hidden;
     }
 
-    /* iframe 容器 */
+    /* iframe 外框（用來裁切） */
     .frame-wrap {
       position: absolute;
       top: 0;
@@ -46,14 +48,14 @@
 
     /* iframe 本體 */
     .frame-inner {
-      width: 6000px; /* 若有橫向移動需放大 */
-      height: 6000px;
+      width: 4000px; /* 控制水平範圍 */
+      height: 4000px; /* 控制垂直範圍 */
       border: none;
       transform-origin: 0 0;
       display: block;
     }
 
-    /* 右側廣告區 */
+    /* 右側廣告 */
     aside {
       background-color: #fafafa;
       padding: 1em;
@@ -68,7 +70,7 @@
       text-align: center;
     }
 
-    /* 控制面板 */
+    /* 底部控制面板 */
     .panel {
       position: absolute;
       bottom: 10px;
@@ -87,80 +89,12 @@
 
     .panel label { display:block; margin-top:5px; }
     .panel input[type="range"] { width:100%; }
+
+    /* 📱 手機模式（可選） */
+    @media (max-width: 768px) {
+      .panel { display: none; }
+      .frame-wrap { position:relative; height:70vh; }
+      .frame-inner { transform:none; height:1600px; width:100%; }
+    }
   </style>
 </head>
-<body>
-  <nav>
-    <h3>網站導覽</h3>
-    <a href="https://www.google.com" target="_blank">Google</a>
-    <a href="https://www.youtube.com" target="_blank">YouTube</a>
-    <a href="https://www.jljh.com.tw/">我要登入</a>
-  </nav>
-
-  <main id="main">
-    <!-- 裁切容器 -->
-    <div class="frame-wrap" id="frameWrap" style="height:2000px;">
-      <iframe id="theFrame" class="frame-inner"
-        src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
-        title="嘉隆商品區" scrolling="no"></iframe>
-    </div>
-
-    <!-- 控制面板 -->
-    <div class="panel">
-      <label>水平位置 (TX)：<span id="txVal"></span></label>
-      <input id="txRange" type="range" min="-3500" max="-201" value="-201" step="10">
-
-      <label>垂直位置 (TY)：<span id="tyVal"></span></label>
-      <input id="tyRange" type="range" min="-3000" max="0" value="-438" step="10">
-
-      <label>可視高度 (VH)：<span id="vhVal"></span></label>
-      <input id="vhRange" type="range" min="500" max="3000" value="2000" step="10">
-    </div>
-  </main>
-
-  <aside>
-    <h3>廣告區</h3>
-    <div class="ad-box">這裡可以放你的廣告 1</div>
-    <div class="ad-box">這裡可以放你的廣告 2</div>
-    <div class="ad-box">或是 Google AdSense 廣告</div>
-  </aside>
-
-  <script>
-    // 初始值與範圍
-    const txStart = -201, txEnd = -3500;
-    const tyStart = -438, tyEnd = -1000;
-    const vhMin = 500, vhMax = 3000;
-
-    const frameWrap = document.getElementById('frameWrap');
-    const theFrame = document.getElementById('theFrame');
-
-    const txRange = document.getElementById('txRange');
-    const tyRange = document.getElementById('tyRange');
-    const vhRange = document.getElementById('vhRange');
-
-    const txVal = document.getElementById('txVal');
-    const tyVal = document.getElementById('tyVal');
-    const vhVal = document.getElementById('vhVal');
-
-    function updateView() {
-      const tx = parseInt(txRange.value);
-      const ty = parseInt(tyRange.value);
-      const vh = parseInt(vhRange.value);
-
-      txVal.textContent = tx + 'px';
-      tyVal.textContent = ty + 'px';
-      vhVal.textContent = vh + 'px';
-
-      frameWrap.style.height = vh + 'px';
-      theFrame.style.transform = `translate(${tx}px, ${ty}px)`;
-    }
-
-    [txRange, tyRange, vhRange].forEach(r => r.addEventListener('input', updateView));
-
-    // 初始化顯示
-    updateView();
-  </script>
-</body>
-</html>
-
-
