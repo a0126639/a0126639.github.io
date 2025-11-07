@@ -134,80 +134,10 @@
     <div class="ad-box">或是 Google AdSense 廣告</div>
   </aside>
 
-  <script>
-    // 固定設
-    const txMin = 3000;  // 向左最遠位置（可自行微調）
-    const txMax = -5000;      // 向右最遠位置（可自行微調）
-    const tyStart = -420; // Y 起始位置
-    const tyMin = -420;  // 向上最遠位置（可自行微調）
-    const tyMax = -5000;      // 向下最遠位置（可自行微調）
 
-    const frameWrap = document.getElementById('frameWrap');
-    const theFrame = document.getElementById('theFrame');
-
-    let currentTy = tyStart;
-    let isDragging = false;
-    let startY = 0;
-    let lastTy = currentTy;
-
-    // 限制範圍
-    function clamp(v, min, max) {
-      return Math.min(Math.max(v, min), max);
-    }
-
-    // 更新畫面
-    function updateTransform() {
-      theFrame.style.transform = `translate(${tx}px, ${currentTy}px)`;
-    }
-
-    // 滾輪控制 Y 軸
-    frameWrap.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      currentTy -= e.deltaY * 0.6; // 感度可自行調整
-      currentTy = clamp(currentTy, tyMin, tyMax);
-      updateTransform();
-    }, { passive: false });
-
-    // 滑鼠拖曳控制 Y 軸
-    frameWrap.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startY = e.clientY;
-      lastTy = currentTy;
-      frameWrap.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const delta = e.clientY - startY;
-      currentTy = clamp(lastTy + delta, tyMin, tyMax);
-      updateTransform();
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-      frameWrap.style.cursor = 'grab';
-    });
-
-    // 手機觸控控制 Y 軸
-    let touchStartY = 0;
-    let touchLastTy = currentTy;
-
-    frameWrap.addEventListener('touchstart', (e) => {
-      touchStartY = e.touches[0].clientY;
-      touchLastTy = currentTy;
-    }, { passive: true });
-
-    frameWrap.addEventListener('touchmove', (e) => {
-      const delta = e.touches[0].clientY - touchStartY;
-      currentTy = clamp(touchLastTy + delta, tyMin, tyMax);
-      updateTransform();
-    }, { passive: true });
-
-    // 初始化
-    updateTransform();
-  </script>
 </body>
 </html>
+
 
 
 
