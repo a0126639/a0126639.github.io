@@ -14,7 +14,7 @@
       overflow: hidden;
     }
 
-    /* 左側選單 */
+    /* 左側選單區 */
     nav {
       background-color: #f0f0f0;
       padding: 1em;
@@ -34,7 +34,7 @@
       overflow: hidden;
     }
 
-    /* iframe 外框（裁切容器） */
+    /* 裁切容器 */
     .frame-wrap {
       position: absolute;
       top: 0;
@@ -42,19 +42,20 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      cursor: grab;
     }
 
-    /* iframe 本體（水平可滾動） */
+    /* 內嵌網頁（iframe） */
     .frame-inner {
-      width: 4000px; /* 夠大以支援 X 軸移動 */
-      height: 100%;  /* 高度滿版 */
+      width: 4000px;
+      height: 4000px;
       border: none;
       transform-origin: 0 0;
       display: block;
-      transition: transform 0.3s ease-out;
+      will-change: transform;
     }
 
-    /* 右側廣告 */
+    /* 右側廣告區 */
     aside {
       background-color: #fafafa;
       padding: 1em;
@@ -69,7 +70,7 @@
       text-align: center;
     }
 
-    /* ====== 📱 手機版設定 ====== */
+    /* 📱 手機版建議設定：不裁切、完整顯示 */
     @media (max-width: 768px) {
       body {
         grid-template-columns: 1fr;
@@ -95,14 +96,13 @@
 
       .frame-wrap {
         position: relative;
-        height: auto;
-        overflow: visible;
+        height: 70vh; /* 手機顯示 70% 視窗高度 */
       }
 
       .frame-inner {
         width: 100%;
-        height: 100vh; /* 以螢幕高為主 */
-        transform: none !important; /* 取消裁切與位移 */
+        height: 100%;
+        transform: none !important; /* 不裁切 */
       }
     }
   </style>
@@ -112,18 +112,18 @@
     <h3>網站導覽</h3>
     <a href="https://www.google.com" target="_blank">Google</a>
     <a href="https://www.youtube.com" target="_blank">YouTube</a>
-    <a href="https://www.jljh.com.tw/">我要登入</a>
+    <a href="https://www.jljh.com.tw/">嘉隆首頁</a>
   </nav>
 
-  <main id="main">
+  <main>
     <div class="frame-wrap" id="frameWrap">
       <iframe
         id="theFrame"
         class="frame-inner"
-        src="https://www.jljh.com.tw/usedcust/"
-        title="蚤來蚤趣"
-        scrolling="no"
-      ></iframe>
+        src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
+        title="嘉隆二手區"
+        scrolling="no">
+      </iframe>
     </div>
   </main>
 
@@ -134,16 +134,76 @@
     <div class="ad-box">或是 Google AdSense 廣告</div>
   </aside>
 
+  <script>
+    // 固定設定
+    const tx = -3100;     // X 固定位置（介於 -2700 ~ -3500）
+    const tyStart = -420; // Y 起始位置
+    const tyMin = -2000;  // 向上最遠位置（可自行微調）
+    const tyMax = 0;      // 向下最遠位置（可自行微調）
+
+    const frameWrap = document.getElementById('frameWrap');
+    const theFrame = document.getElementById('theFrame');
+
+    let currentTy = tyStart;
+    let isDragging = false;
+    let startY = 0;
+    let lastTy = currentTy;
+
+    // 限制範圍
+    function clamp(v, min, max) {
+      return Math.min(Math.max(v, min), max);
+    }
+
+    // 更新畫面
+    function updateTransform() {
+      theFrame.style.transform = `translate(${tx}px, ${currentTy}px)`;
+    }
+
+    // 滾輪控制 Y 軸
+    frameWrap.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      currentTy -= e.deltaY * 0.6; // 感度可自行調整
+      currentTy = clamp(currentTy, tyMin, tyMax);
+      updateTransform();
+    }, { passive: false });
+
+    // 滑鼠拖曳控制 Y 軸
+    frameWrap.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startY = e.clientY;
+      lastTy = currentTy;
+      frameWrap.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const delta = e.clientY - startY;
+      currentTy = clamp(lastTy + delta, tyMin, tyMax);
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      frameWrap.style.cursor = 'grab';
+    });
+
+    // 手機觸控控制 Y 軸
+    let touchStartY = 0;
+    let touchLastTy = currentTy;
+
+    frameWrap.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+      touchLastTy = currentTy;
+    }, { passive: true });
+
+    frameWrap.addEventListener('touchmove', (e) => {
+      const delta = e.touches[0].clientY - touchStartY;
+      currentTy = clamp(touchLastTy + delta, tyMin, tyMax);
+      updateTransform();
+    }, { passive: true });
+
+    // 初始化
+    updateTransform();
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
