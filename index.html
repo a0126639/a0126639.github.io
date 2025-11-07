@@ -45,11 +45,14 @@
   </nav>
 
   <main>
-    <!-- iframe：把公司網站嵌入到中間 -->
-    <iframe id="companyFrame"
-      src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
-      title="嘉隆二手車">
+  <div style="width:100%; height:100%; overflow:hidden;">
+    <iframe 
+      src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg=" 
+      style="width:100%; height:2000px; border:none; margin-top:-300px;" 
+      title="商品區">
     </iframe>
+  </div>
+</main>
 
     <!-- 如果 iframe 被擋，顯示這個備援訊息與按鈕 -->
     <div id="fallback" class="fallback" style="display:none;">
@@ -86,3 +89,4 @@
   </script>
 </body>
 </html>
+
