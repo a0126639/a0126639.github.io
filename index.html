@@ -63,23 +63,14 @@
     <a href="https://www.jljh.com.tw/">我要登入</a>
   </nav>
 
-   <main id="main">
-    <div class="topbar">
-      <a href="https://www.jljh.com.tw/usedcust/index.php?t=1&npg=" target="_blank" rel="noopener noreferrer">在新分頁開原站</a>
-    </div>
-
-    <!-- 裁切容器（固定高度 2000px）-->
-    <div class="frame-wrap" id="frameWrap" style="height:2000px;">
-      <iframe id="theFrame" class="frame-inner"
-        src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
-        title="蚤來蚤趣" scrolling="no"></iframe>
-    </div>
-
-    <!-- 若 iframe 被阻擋或載入失敗，就顯示備援 -->
-    <div id="fallback">
-      <strong>提醒：</strong> 若中間區域空白，表示該網站不允許嵌入 (X-Frame-Options/CSP) 或被瀏覽器阻擋第三方 cookie。請按上方「在新分頁開原站」開啟原網站。
-    </div>
-  </main>
+<main id="main">
+  <!-- 裁切容器（固定高度 2000px）-->
+  <div class="frame-wrap" id="frameWrap" style="height:2000px;">
+    <iframe id="theFrame" class="frame-inner"
+      src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
+      title="蚤來蚤趣" scrolling="no"></iframe>
+  </div>
+</main>
 
   <aside>
     <h3>廣告區</h3>
@@ -89,4 +80,5 @@
   </aside>
 </body>
 </html>
+
 
