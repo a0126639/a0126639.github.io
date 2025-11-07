@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>我的多區域網站</title>
   <style>
     body {
@@ -12,46 +12,27 @@
       height: 100vh;
       font-family: Arial, sans-serif;
     }
-
-    /* 左側選單區 */
     nav {
       background-color: #f0f0f0;
       padding: 1em;
       border-right: 1px solid #ccc;
     }
-
-    nav a {
-      display: block;
-      margin: 10px 0;
-      text-decoration: none;
-      color: #333;
-    }
-
-    /* 中間主內容（iframe） */
-    main {
-      padding: 0;
-      border: none;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* 右側廣告區 */
+    nav a { display:block; margin:10px 0; text-decoration:none; color:#333; }
+    main { padding:0; border:none; }
+    iframe { width:100%; height:100%; border:none; }
     aside {
       background-color: #fafafa;
       padding: 1em;
-      border-left: 1px solid #ccc;
-      overflow-y: auto;
+      border-left:1px solid #ccc;
+      overflow-y:auto;
     }
-
-    .ad-box {
-      background-color: #e0e0e0;
-      padding: 10px;
-      margin-bottom: 10px;
-      text-align: center;
+    .ad-box { background-color:#e0e0e0; padding:10px; margin-bottom:10px; text-align:center; }
+    .fallback {
+      padding: 1em;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      margin: 10px;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -60,18 +41,23 @@
     <h3>網站導覽</h3>
     <a href="https://www.google.com" target="_blank">Google</a>
     <a href="https://www.youtube.com" target="_blank">YouTube</a>
-    <a href="https://www.jljh.com.tw/">嘉隆首頁</a>
+    <a href="https://www.jljh.com.tw/" target="_blank">嘉隆首頁</a>
   </nav>
-  
-<iframe 
-  src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg=" 
-  style="width:100%; height:90vh; border:none;" 
-  title="公司官網">
-</iframe>
-  
+
   <main>
-    <!-- 將原網站嵌入 -->
-    <iframe src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg=" title="嘉隆二手車"></iframe>
+    <!-- iframe：把公司網站嵌入到中間 -->
+    <iframe id="companyFrame"
+      src="https://www.jljh.com.tw/usedcust/index.php?t=1&npg="
+      title="嘉隆二手車">
+    </iframe>
+
+    <!-- 如果 iframe 被擋，顯示這個備援訊息與按鈕 -->
+    <div id="fallback" class="fallback" style="display:none;">
+      無法在本頁嵌入公司網站（iframe 被阻擋或第三方 cookie 被封鎖）。<br/>
+      <a id="openNew" href="https://www.jljh.com.tw/usedcust/index.php?t=1&npg=" target="_blank" rel="noopener noreferrer">
+        點此在新分頁開啟公司網站登入
+      </a>
+    </div>
   </main>
 
   <aside>
@@ -80,6 +66,23 @@
     <div class="ad-box">這裡可以放你的廣告 2</div>
     <div class="ad-box">或是 Google AdSense 廣告</div>
   </aside>
-</body>
 
+  <script>
+    // 嘗試偵測 iframe 是否能正常載入 (簡單判斷：load 事件若在 5 秒內沒有觸發，顯示備援)
+    const iframe = document.getElementById('companyFrame');
+    const fallback = document.getElementById('fallback');
+    let loaded = false;
+
+    iframe.addEventListener('load', () => {
+      loaded = true;
+      // 載入成功就隱藏備援（若載入但內部有 login 問題，那就是 cookie / sameSite 問題）
+      fallback.style.display = 'none';
+    });
+
+    // 5 秒後如果還沒 load，顯示備援
+    setTimeout(() => {
+      if (!loaded) fallback.style.display = 'block';
+    }, 5000);
+  </script>
+</body>
 </html>
