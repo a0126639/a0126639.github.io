@@ -117,7 +117,7 @@
     <div class="row">
       <button id="left1" class="small">◀1</button>
       <button id="left5" class="small">◀5</button>
-      <button id="left10" class="small">◀10</button>
+      <button id="left100" class="small">◀10</button>
       <button id="right1" class="small">1▶</button>
       <button id="right5" class="small">5▶</button>
       <button id="right10" class="small">10▶</button>
@@ -136,12 +136,12 @@
 
   <script>
     // ---- 可修改起註值（初始值） ----
-    let tx = -3100; // 初始 X（可用面板或鍵盤調整）
+    let tx = -2700; // 初始 X（可用面板或鍵盤調整）
     let ty = -420;  // 初始 Y
 
     // 建議你最終的 X 範圍可以是 -2700 到 -3500（依內容寬度調整）
     const TX_MIN = -3500; // 最左（更負）
-    const TX_MAX = -2700; // 最右（較小負）
+    const TX_MAX = -200; // 最右（較小負）
 
     // Y 範圍（可自行調）
     const TY_MIN = -2000;
@@ -247,3 +247,4 @@
   </script>
 </body>
 </html>
+
