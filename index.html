@@ -2,20 +2,20 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>蚤激安寄賣小舖（X 裁切，Y 原生捲動）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>蚤激安寄賣小舖（限制滾動範圍）</title>
   <style>
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
     body{
       font-family: Arial, sans-serif;
       display:grid;
-      grid-template-columns:200px 1fr 250px;
+      grid-template-columns:150px 1fr 250px; /* 左中右三欄 */
       height:100vh;
       overflow:hidden;
     }
 
-    /* 左側 */
+    /* 左側連結區 */
     nav{
       background:#f0f0f0;
       padding:16px;
@@ -24,27 +24,26 @@
     nav a{display:block;margin:8px 0;color:#333;text-decoration:none}
 
     /* 中間主區 */
-    main{position:relative; overflow:hidden; background:#fff;}
-    .crop {
-      position:absolute; left:0; top:0;
-      width:100%; height:100%;
-      overflow:hidden; /* 隱藏超出部分，做水平裁切 */
+    main{
+      position:relative;
+      overflow:hidden;
+      background:#fff;
+    }
+    .crop{
+      position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;
       background:#fff;
     }
 
-    /* wrapper 只用來水平平移（X），高度與 iframe 一致 */
     .wrapper{
-      position:absolute;
-      left:0; top:0;
-      width:4000px; /* 足夠寬以支援水平移動 */
-      height:100%;  /* 高度百分比，讓 iframe 自身可滾動 */
+      position:absolute;left:0;top:0;
+      width:4000px;height:4000px; /* 足夠容納位移 */
       transform-origin:0 0;
       will-change:transform;
     }
-    .wrapper iframe{
+    iframe{
       display:block;
       width:100%;
-      height:100%; /* iframe 高度為 wrapper 的高度（即 crop 的高度） */
+      height:100%;
       border:0;
     }
 
@@ -57,7 +56,7 @@
     }
     .ad-box{background:#e8e8e8;padding:10px;margin-bottom:10px;text-align:center}
 
-    /* 手機：取消裁切，完整顯示原站 */
+    /* 手機：取消裁切、完整顯示原站 */
     @media (max-width:768px){
       body{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;height:auto;overflow:auto}
       nav{border-bottom:1px solid #ddd}
@@ -65,7 +64,7 @@
       main{height:auto}
       .crop{position:relative;height:70vh}
       .wrapper{position:relative;width:100%;height:100%;transform:none !important}
-      .wrapper iframe{width:100%;height:100%}
+      iframe{width:100%;height:100%}
     }
   </style>
 </head>
@@ -80,10 +79,12 @@
   <main>
     <div class="crop">
       <div class="wrapper" id="wrapper">
-        <!-- iframe 高度為可視區高度 (crop 的高度)；內文若超出會出現 iframe 的內建捲軸 -->
-        <iframe id="theIframe"
+        <iframe
+          id="theIframe"
           src="https://www.jljh.com.tw/usedcust/index.php?mkind=1&list_bno=BD&list_area=A&cate_no=&mnotea=&bagok=%E6%90%9C%E5%B0%8B"
-          title="公司商品列表" scrolling="yes"></iframe>
+          title="公司商品列表"
+          scrolling="no">
+        </iframe>
       </div>
     </div>
   </main>
@@ -96,30 +97,77 @@
   </aside>
 
   <script>
-    // ---------- 這裡控制水平 (X) 的位移 ----------
-    // 預設值（你之前給的是 tx=-1706，我把它放在這裡；可修改）
-    const tx = -1706; // 若要把視窗向右移，改成較小負值；向左看更多改成更負
-    // 我們不再使用 translateY；垂直滾動由 iframe 自己處理
+    /* 
+      🧭 可調參數：
+      tx  = X 固定水平位移
+      tyStart = 初始垂直位置
+      tyMin / tyMax = 上下移動限制範圍
+    */
+    const tx = -1706;   // 水平位置固定（你之前提供）
+    let ty = -151;      // 初始 Y
+    const tyMin = -400; // 往上最多
+    const tyMax = 300;  // 往下最多
 
     const wrapper = document.getElementById('wrapper');
     const iframe = document.getElementById('theIframe');
 
-    function applyX() {
-      // 只套用 X 位移
-      wrapper.style.transform = `translateX(${tx}px)`;
-      // 若你還想觀察 transform：
-      console.log('applied translateX(', tx, ')');
+    function clamp(v, min, max) {
+      return Math.min(Math.max(v, min), max);
     }
-    applyX();
 
-    // 偵測 iframe 是否載入（若中間空白，請檢查 DevTools Console 是否有 X-Frame-Options/CSP）
+    function applyTransform() {
+      wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
+    }
+
+    // 滾輪控制上下移動
+    document.querySelector('main').addEventListener('wheel', (e) => {
+      e.preventDefault();
+      ty -= e.deltaY * 0.6; // 滾動速度
+      ty = clamp(ty, tyMin, tyMax);
+      applyTransform();
+    }, { passive: false });
+
+    // 滑鼠拖曳
+    let dragging = false;
+    let startY = 0;
+    let startTy = ty;
+    document.querySelector('main').addEventListener('mousedown', (e) => {
+      dragging = true;
+      startY = e.clientY;
+      startTy = ty;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const delta = e.clientY - startY;
+      ty = clamp(startTy + delta, tyMin, tyMax);
+      applyTransform();
+    });
+    window.addEventListener('mouseup', () => dragging = false);
+
+    // 觸控滑動
+    let tStartY = 0, tStartTy = ty;
+    document.querySelector('main').addEventListener('touchstart', (e) => {
+      tStartY = e.touches[0].clientY;
+      tStartTy = ty;
+    }, { passive: true });
+    document.querySelector('main').addEventListener('touchmove', (e) => {
+      const delta = e.touches[0].clientY - tStartY;
+      ty = clamp(tStartTy + delta, tyMin, tyMax);
+      applyTransform();
+    }, { passive: true });
+
+    // 初始化
+    applyTransform();
+
+    // 檢查 iframe 是否成功載入
     let loaded = false;
-    iframe.addEventListener('load', ()=>{ loaded = true; console.log('iframe loaded'); });
-    setTimeout(()=>{ if(!loaded) console.warn('iframe 尚未載入（3s），若空白請檢查 Console 是否有 X-Frame-Options/CSP）'); }, 3000);
-
-    // ---------- 小提示：如果你想快速在 Console 試別的 TX 值 ----------
-    // 在 DevTools -> Console 執行下面一行（把 -1800 改成你想測試的數值）：
-    // document.getElementById('wrapper').style.transform = 'translateX(-1800px)';
+    iframe.addEventListener('load', () => {
+      loaded = true;
+      console.log('iframe loaded');
+    });
+    setTimeout(() => {
+      if (!loaded) console.warn('iframe 可能被拒載（X-Frame-Options/CSP）');
+    }, 3000);
   </script>
 </body>
 </html>
