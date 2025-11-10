@@ -29,22 +29,45 @@
       overflow:hidden;
       background:#fff;
     }
-    .crop{
-      position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;
-      background:#fff;
-    }
 
+    /* 裁切視窗（限制滾動區域） */
+    .crop{
+      position:absolute;
+      left:0; top:0;
+      width:100%; height:100%;
+      overflow:hidden; /* 外部隱藏，內容由 JS 移動 */
+      background:#fff;
+      touch-action: none; /* 禁用預設觸控滾動，交由 JS 處理 */
+      cursor: grab;
+    }
+    .crop.dragging { cursor: grabbing; }
+
+    /* 內容 wrapper（我們用 transform 移動它）*/
     .wrapper{
-      position:absolute;left:0;top:0;
-      width:4000px;height:4000px; /* 足夠容納位移 */
+      position:absolute;
+      left:0; top:0;
+      width:4000px; height:4000px; /* 保留你原本給的大尺寸 */
       transform-origin:0 0;
       will-change:transform;
+      -webkit-user-select:none;
+      user-select:none;
+      pointer-events: none; /* 禁用 wrapper 上的 pointer，以免干擾 iframe 的互動 */
     }
+
+    /* iframe 放在 wrapper 中，但需要能接受互動（pointer-events: auto） */
+    .frame-wrap {
+      position:relative;
+      width:100%;
+      height:100%;
+      pointer-events: auto; /* 允許 iframe 接受點擊 */
+    }
+
     iframe{
       display:block;
       width:100%;
       height:100%;
       border:0;
+      pointer-events: auto;
     }
 
     /* 右側廣告 */
@@ -62,8 +85,8 @@
       nav{border-bottom:1px solid #ddd}
       aside{border-top:1px solid #ddd}
       main{height:auto}
-      .crop{position:relative;height:70vh}
-      .wrapper{position:relative;width:100%;height:100%;transform:none !important}
+      .crop{position:relative;height:70vh; touch-action: auto; cursor: default}
+      .wrapper{position:relative;width:100%;height:100%;transform:none !important; pointer-events:auto}
       iframe{width:100%;height:100%}
     }
   </style>
@@ -77,14 +100,17 @@
   </nav>
 
   <main>
-    <div class="crop">
+    <div class="crop" id="crop">
       <div class="wrapper" id="wrapper">
-        <iframe
-          id="theIframe"
-          src="https://www.jljh.com.tw/usedcust/index.php?mkind=1&list_bno=BD&list_area=A&cate_no=&mnotea=&bagok=%E6%90%9C%E5%B0%8B"
-          title="公司商品列表"
-          scrolling="no">
-        </iframe>
+        <!-- 讓 iframe 在一個可點擊的容器內 -->
+        <div class="frame-wrap">
+          <iframe
+            id="theIframe"
+            src="https://www.jljh.com.tw/usedcust/index.php?mkind=1&list_bno=BD&list_area=A&cate_no=&mnotea=&bagok=%E6%90%9C%E5%B0%8B"
+            title="公司商品列表"
+            scrolling="no">
+          </iframe>
+        </div>
       </div>
     </div>
   </main>
@@ -97,78 +123,129 @@
   </aside>
 
   <script>
-    /* 
-      🧭 可調參數：
-      tx  = X 固定水平位移
-      tyStart = 初始垂直位置
-      tyMin / tyMax = 上下移動限制範圍
-    */
-    const tx = -1706;   // 水平位置固定（你之前提供）
-    let ty = -151;      // 初始 Y
-    const tyMin = -400; // 往上最多
-    const tyMax = 800;  // 往下最多
+    /* -------------------------
+      可調參數（你可以調整）
+      tx  = X 固定水平位移（保留你原本的 -1706）
+      speedWheel = 滾輪靈敏度（>0）
+    ------------------------- */
+    const tx = -1706;             // 水平位移（固定）
+    const speedWheel = 0.8;       // 滾輪速度倍數（0.5~1.5 之間常用）
 
+    const crop = document.getElementById('crop');
     const wrapper = document.getElementById('wrapper');
     const iframe = document.getElementById('theIframe');
 
-    function clamp(v, min, max) {
-      return Math.min(Math.max(v, min), max);
-    }
+    // 動態上下限制（會在 init/resize 時計算）
+    let ty = 0;       // 當前 Y（transform 的 translateY）
+    let tyMin = 0;    // 最大可往上（負值或 0）
+    let tyMax = 0;    // 最大可往下（通常 0）
+    let isDragging = false;
+    let startY = 0;
+    let startTy = 0;
 
+    function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
+
+    // 設定 transform
     function applyTransform() {
-      wrapper.style.transform = `translate(${tx}px, ${ty}px)`;
+      // 使用整數避免 sub-pixel 模糊
+      const txInt = Math.round(tx);
+      const tyInt = Math.round(ty);
+      wrapper.style.transform = `translate(${txInt}px, ${tyInt}px)`;
     }
 
-    // 滾輪控制上下移動
-    document.querySelector('main').addEventListener('wheel', (e) => {
+    // 依據 crop 與 wrapper 高度計算範圍
+    function updateBounds() {
+      // crop 可視高度
+      const cropH = crop.clientHeight;
+      // wrapper 實際內容高度（使用 CSS 高度值或 scrollHeight）
+      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
+
+      // 設計：ty 表示 wrapper 的 translateY
+      // 使 wrapper 的頂部不能往下超過 0（也就是不能露出空白在上方）
+      tyMax = 0;
+      // wrapper 底部不能往上露出空白在底部 => tyMin = cropH - wrapperH
+      tyMin = Math.min(0, cropH - wrapperH);
+
+      // 保證當前 ty 在範圍內
+      ty = clamp(ty, tyMin, tyMax);
+      applyTransform();
+    }
+
+    // 初始化與監聽 resize（視窗或容器大小變化要重新計算）
+    function init() {
+      // 若 wrapper 的內容高度非常小，確保 wrapperH >= cropH，否則會看到上/下空白（這是正常的）
+      updateBounds();
+    }
+    window.addEventListener('resize', updateBounds);
+    window.addEventListener('orientationchange', updateBounds);
+    // 等 iframe 嘗試載入後也更新（有些情況 iframe 會影響 scrollHeight）
+    iframe.addEventListener('load', () => {
+      setTimeout(updateBounds, 200); // 稍微延遲一次計算
+      console.log('iframe loaded (若被拒載則可能無法偵測高度變化)');
+    });
+
+    /* ------------------------
+      滾輪：只在 crop 範圍內作用，並 preventDefault 阻止整頁滾動
+    ------------------------ */
+    crop.addEventListener('wheel', (e) => {
+      // 只有在 desktop / 有 wheel 的情況下
       e.preventDefault();
-      ty -= e.deltaY * 0.6; // 滾動速度
+      const delta = e.deltaY * speedWheel;
+      // 往下滾（delta>0）時，內容往上移（ty 減小）
+      ty -= delta;
       ty = clamp(ty, tyMin, tyMax);
       applyTransform();
     }, { passive: false });
 
-    // 滑鼠拖曳
-    let dragging = false;
-    let startY = 0;
-    let startTy = ty;
-    document.querySelector('main').addEventListener('mousedown', (e) => {
-      dragging = true;
+    /* ------------------------
+      滑鼠拖曳（desktop）
+    ------------------------ */
+    crop.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return; // 只處理左鍵
+      isDragging = true;
       startY = e.clientY;
       startTy = ty;
+      crop.classList.add('dragging');
+      // 防止選取文字
+      e.preventDefault();
     });
     window.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
+      if (!isDragging) return;
       const delta = e.clientY - startY;
       ty = clamp(startTy + delta, tyMin, tyMax);
       applyTransform();
     });
-    window.addEventListener('mouseup', () => dragging = false);
-
-    // 觸控滑動
-    let tStartY = 0, tStartTy = ty;
-    document.querySelector('main').addEventListener('touchstart', (e) => {
-      tStartY = e.touches[0].clientY;
-      tStartTy = ty;
-    }, { passive: true });
-    document.querySelector('main').addEventListener('touchmove', (e) => {
-      const delta = e.touches[0].clientY - tStartY;
-      ty = clamp(tStartTy + delta, tyMin, tyMax);
-      applyTransform();
-    }, { passive: true });
-
-    // 初始化
-    applyTransform();
-
-    // 檢查 iframe 是否成功載入
-    let loaded = false;
-    iframe.addEventListener('load', () => {
-      loaded = true;
-      console.log('iframe loaded');
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      crop.classList.remove('dragging');
     });
-    setTimeout(() => {
-      if (!loaded) console.warn('iframe 可能被拒載（X-Frame-Options/CSP）');
-    }, 3000);
+
+    /* ------------------------
+      觸控（mobile / tablet）
+      注意：在 CSS 我把 touch-action: none 加到 .crop，所以這裡可以安全用 passive:false
+    ------------------------ */
+    let touchStartY = 0;
+    let touchStartTy = 0;
+    crop.addEventListener('touchstart', (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartTy = ty;
+    }, { passive: true }); // 不需要 preventDefault 在 start
+
+    crop.addEventListener('touchmove', (e) => {
+      if (!e.touches || e.touches.length === 0) return;
+      // preventDefault 以阻止瀏覽器原生滾動（我們已在 CSS 用 touch-action: none，但這裡保險）
+      e.preventDefault && e.preventDefault();
+      const delta = e.touches[0].clientY - touchStartY;
+      ty = clamp(touchStartTy + delta, tyMin, tyMax);
+      applyTransform();
+    }, { passive: false });
+
+    /* 初始化 */
+    init();
+    // 若 document ready 時元素尺寸還沒定好，也延遲一次 update
+    window.addEventListener('load', () => setTimeout(updateBounds, 80));
   </script>
 </body>
 </html>
-
