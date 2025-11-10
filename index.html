@@ -1,156 +1,166 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu } from 'lucide-react';
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>三欄範例（靜態）</title>
 
-// Simple three-column layout component
-// Left: navigation/links
-// Center: dynamic content area (updates when a link is clicked)
-// Right: ad / promo area
+  <!-- Tailwind Play CDN (適合 demo / 小專案，不建議生產用大量客製) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-export default function ThreeColumnLayout() {
-  const [activeId, setActiveId] = useState('home');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  <style>
+    /* small extra styling for prose-like content */
+    .prose p { line-height: 1.6; color: #374151; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <header class="sm:hidden bg-white shadow-sm sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="menu-toggle" class="p-2 rounded-md hover:bg-gray-100">☰</button>
+        <h1 class="text-lg font-semibold">我的三欄網頁</h1>
+      </div>
+      <div class="text-sm text-gray-600">廣告區</div>
+    </div>
+  </header>
 
-  const links = [
-    { id: 'home', label: '首頁', summary: '歡迎來到首頁 — 這裡放置介紹、精選內容或公告。' },
-    { id: 'about', label: '關於我們', summary: '關於本網站的背景故事、團隊或聯絡資訊。' },
-    { id: 'articles', label: '文章', summary: '文章列表／精選文章摘要。' },
-    { id: 'resources', label: '資源', summary: '下載、工具連結或常見問答 (FAQ)。' },
-    { id: 'contact', label: '聯絡我們', summary: '聯絡表單或客服資訊。' },
-  ];
+  <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-[220px_1fr_300px] gap-6">
+    <!-- 左側 -->
+    <aside id="left-nav" class="bg-white rounded-2xl shadow-sm p-3">
+      <nav id="nav-list" class="space-y-2"></nav>
+      <div class="mt-4 text-xs text-gray-500">提示：點擊左側項目，內容會顯示在中間區塊。</div>
+    </aside>
 
-  const activeItem = links.find((l) => l.id === activeId) || links[0];
-
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      {/* Top bar for small screen to toggle left nav */}
-      <header className="sm:hidden bg-white shadow-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              aria-label="切換選單"
-              className="p-2 rounded-md hover:bg-gray-100"
-              onClick={() => setSidebarOpen((s) => !s)}
-            >
-              <Menu size={20} />
-            </button>
-            <h1 className="text-lg font-semibold">我的三欄網頁</h1>
-          </div>
-          <div className="text-sm text-gray-600">廣告區</div>
+    <!-- 中間內容 -->
+    <main id="content" class="bg-white rounded-2xl shadow p-6 min-h-[320px]">
+      <header class="flex items-start justify-between gap-4">
+        <div>
+          <h2 id="content-title" class="text-2xl font-bold">首頁</h2>
+          <p id="content-sub" class="text-sm text-gray-500 mt-1">目前顯示：home</p>
         </div>
+        <div class="text-sm text-gray-500">可放置分享按鈕 / 功能按鈕</div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-[220px_1fr_300px] gap-6">
-        {/* Left: Navigation */}
-        <aside
-          className={`bg-white rounded-2xl shadow-sm p-3 transition-transform duration-200 ${
-            sidebarOpen ? 'translate-x-0' : 'sm:translate-x-0 -translate-x-0'
-          }`}
-          aria-label="主要連結選單"
-        >
-          <nav className="space-y-2">
-            {links.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => {
-                  setActiveId(link.id);
-                  setSidebarOpen(false); // auto-close on mobile
-                }}
-                className={`w-full text-left rounded-lg px-3 py-2 flex items-center justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
-                  activeId === link.id
-                    ? 'bg-indigo-600 text-white shadow'
-                    : 'hover:bg-gray-100 text-gray-800'
-                }`}
-                aria-current={activeId === link.id ? 'page' : undefined}
-              >
-                <span className="font-medium">{link.label}</span>
-                <span className="text-xs text-gray-400">›</span>
-              </button>
-            ))}
-          </nav>
+      <section id="content-body" class="mt-6 prose">
+        <p>歡迎 — 點左側連結來切換內容。</p>
+      </section>
+    </main>
 
-          <div className="mt-4 text-xs text-gray-500">
-            提示：點擊左側項目，內容會顯示在中間區塊。
+    <!-- 右側廣告 -->
+    <aside class="hidden sm:block">
+      <div class="space-y-4 sticky top-6">
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
+          <div class="font-semibold">廣告 / 推廣</div>
+          <p class="mt-2 text-gray-600 text-xs">放置橫幅或聯盟廣告位置。</p>
+          <div class="mt-3 grid gap-3">
+            <div class="border rounded-lg p-3 text-center">廣告 300×250</div>
+            <div class="border rounded-lg p-3 text-center">廣告 300×250</div>
           </div>
-        </aside>
+        </div>
 
-        {/* Center: Content area */}
-        <main className="bg-white rounded-2xl shadow p-6 min-h-[320px]">
-          <header className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">{activeItem.label}</h2>
-              <p className="text-sm text-gray-500 mt-1">目前顯示：{activeItem.id}</p>
-            </div>
-            <div className="text-sm text-gray-500">可放置分享按鈕 / 功能按鈕</div>
-          </header>
-
-          <section className="mt-6">
-            <AnimatePresence mode="wait">
-              <motion.article
-                key={activeItem.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.22 }}
-                className="prose max-w-none"
-              >
-                <p className="text-gray-700">{activeItem.summary}</p>
-
-                {/* Example extended content for demo */}
-                <div className="mt-4 space-y-3">
-                  <p>
-                    這裡可以放長內容：圖片、文章、表格或其他互動元件。你也可以把不同連結對應到後端 API，點擊時用 fetch 載入真實資料。
-                  </p>
-
-                  <div className="rounded-lg border p-3 bg-gray-50">
-                    <strong>範例區塊：</strong>
-                    <p className="text-sm text-gray-600 mt-1">示範內容卡片 — 可替換為動態內容。</p>
-                  </div>
-                </div>
-
-                {/* Optional: more content so the area looks realistic */}
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold">相關項目</h3>
-                  <ul className="list-disc ml-5 mt-2 text-gray-700">
-                    <li>子項目 A</li>
-                    <li>子項目 B</li>
-                    <li>子項目 C</li>
-                  </ul>
-                </div>
-              </motion.article>
-            </AnimatePresence>
-          </section>
-        </main>
-
-        {/* Right: Ads / Promo area */}
-        <aside className="hidden sm:block">
-          <div className="space-y-4 sticky top-6">
-            <div className="bg-white rounded-2xl shadow-sm p-4 text-sm">
-              <div className="font-semibold">廣告 / 推廣</div>
-              <p className="mt-2 text-gray-600 text-xs">放置橫幅、互動廣告或聯盟廣告位置。</p>
-
-              <div className="mt-3 grid gap-3">
-                <div className="border rounded-lg p-3 text-center">廣告 300×250</div>
-                <div className="border rounded-lg p-3 text-center">廣告 300×250</div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-4 text-sm">
-              <div className="font-semibold">推薦內容</div>
-              <ul className="mt-2 text-gray-700 text-sm space-y-2">
-                <li className="hover:text-indigo-600">推薦文章 A</li>
-                <li className="hover:text-indigo-600">推薦工具 B</li>
-                <li className="hover:text-indigo-600">推薦課程 C</li>
-              </ul>
-            </div>
-          </div>
-        </aside>
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
+          <div class="font-semibold">推薦內容</div>
+          <ul class="mt-2 text-gray-700 text-sm space-y-2">
+            <li class="hover:text-indigo-600">推薦文章 A</li>
+            <li class="hover:text-indigo-600">推薦工具 B</li>
+            <li class="hover:text-indigo-600">推薦課程 C</li>
+          </ul>
+        </div>
       </div>
+    </aside>
+  </div>
 
-      {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">
-        © {new Date().getFullYear()} 我的網站範例。可依需求修改樣式與資料來源。
-      </footer>
-    </div>
-  );
-}
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">© <span id="year"></span> 我的網站範例。</footer>
+
+  <script>
+    // 動態資料（可改成 fetch 從外部 JSON 讀）
+    const links = [
+      { id: 'home', label: '首頁', summary: '歡迎來到首頁 — 這裡放置介紹、精選內容或公告。' },
+      { id: 'about', label: '關於我們', summary: '關於本網站的背景故事、團隊或聯絡資訊。' },
+      { id: 'articles', label: '文章', summary: '文章列表／精選文章摘要。' },
+      { id: 'resources', label: '資源', summary: '下載、工具連結或常見問答 (FAQ)。' },
+      { id: 'contact', label: '聯絡我們', summary: '聯絡表單或客服資訊。' },
+    ];
+
+    const navList = document.getElementById('nav-list');
+    const contentTitle = document.getElementById('content-title');
+    const contentSub = document.getElementById('content-sub');
+    const contentBody = document.getElementById('content-body');
+    const yearSpan = document.getElementById('year');
+
+    yearSpan.textContent = new Date().getFullYear();
+
+    let activeId = 'home';
+
+    function renderNav() {
+      navList.innerHTML = '';
+      links.forEach(link => {
+        const btn = document.createElement('button');
+        btn.className = [
+          'w-full', 'text-left', 'rounded-lg', 'px-3', 'py-2', 'flex', 'items-center', 'justify-between',
+          'focus:outline-none'
+        ].join(' ');
+        btn.dataset.id = link.id;
+        btn.innerHTML = `<span class="font-medium">${link.label}</span><span class="text-xs text-gray-400">›</span>`;
+        if (activeId === link.id) {
+          btn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+        } else {
+          btn.classList.add('hover:bg-gray-100', 'text-gray-800');
+        }
+        btn.addEventListener('click', () => {
+          activeId = link.id;
+          updateContent();
+          renderNav();
+          // close mobile menu if open
+          if (window.innerWidth < 640) leftNav.classList.remove('translate-x-0');
+        });
+        navList.appendChild(btn);
+      });
+    }
+
+    function updateContent() {
+      const item = links.find(l => l.id === activeId) || links[0];
+      contentTitle.textContent = item.label;
+      contentSub.textContent = '目前顯示：' + item.id;
+      contentBody.innerHTML = `
+        <p>${item.summary}</p>
+        <div class="mt-4 space-y-3">
+          <div class="rounded-lg border p-3 bg-gray-50"><strong>範例區塊：</strong>
+            <p class="text-sm text-gray-600 mt-1">示範內容卡片 — 可替換為動態內容。</p>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold">相關項目</h3>
+          <ul class="list-disc ml-5 mt-2 text-gray-700">
+            <li>子項目 A</li>
+            <li>子項目 B</li>
+            <li>子項目 C</li>
+          </ul>
+        </div>`;
+    }
+
+    // mobile toggle
+    const leftNav = document.getElementById('left-nav');
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      leftNav.classList.toggle('-translate-x-full');
+      leftNav.classList.toggle('translate-x-0');
+    });
+
+    // init
+    leftNav.classList.add('translate-x-0'); // ensure visible on desktop
+    renderNav();
+    updateContent();
+
+    // accessibility: close nav if clicked outside on narrow screens
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 640) {
+        const withinNav = e.target.closest('#left-nav') || e.target.closest('#menu-toggle');
+        if (!withinNav) {
+          leftNav.classList.add('-translate-x-full');
+          leftNav.classList.remove('translate-x-0');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
