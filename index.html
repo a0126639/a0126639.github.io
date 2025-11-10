@@ -1,418 +1,156 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>蚤激安寄賣小舖（限制滾動範圍 + 可見捲軸）</title>
-  <style>
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{
-      font-family: Arial, sans-serif;
-      display:grid;
-      grid-template-columns:150px 1fr 250px; /* 左中右三欄 */
-      height:100vh;
-      overflow:hidden;
-    }
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu } from 'lucide-react';
 
-    /* 左側連結區 */
-    nav{
-      background:#f0f0f0;
-      padding:16px;
-      border-right:1px solid #ddd;
-    }
-    nav a{display:block;margin:8px 0;color:#333;text-decoration:none}
+// Simple three-column layout component
+// Left: navigation/links
+// Center: dynamic content area (updates when a link is clicked)
+// Right: ad / promo area
 
-    /* 中間主區 */
-    main{
-      position:relative;
-      overflow:hidden;
-      background:#fff;
-    }
+export default function ThreeColumnLayout() {
+  const [activeId, setActiveId] = useState('home');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    /* 裁切視窗（限制滾動區域） */
-    .crop{
-      position:absolute;
-      left:0; top:0;
-      width:100%; height:100%;
-      overflow:hidden; /* 外部隱藏，內容由 JS 移動 */
-      background:#fff;
-      touch-action: none; /* 交由 JS 處理觸控 */
-      cursor: grab;
-    }
-    .crop.dragging { cursor: grabbing; }
+  const links = [
+    { id: 'home', label: '首頁', summary: '歡迎來到首頁 — 這裡放置介紹、精選內容或公告。' },
+    { id: 'about', label: '關於我們', summary: '關於本網站的背景故事、團隊或聯絡資訊。' },
+    { id: 'articles', label: '文章', summary: '文章列表／精選文章摘要。' },
+    { id: 'resources', label: '資源', summary: '下載、工具連結或常見問答 (FAQ)。' },
+    { id: 'contact', label: '聯絡我們', summary: '聯絡表單或客服資訊。' },
+  ];
 
-    /* 內容 wrapper（我們用 transform 移動它）*/
-    .wrapper{
-      position:absolute;
-      left:0; top:0;
-      width:4000px; height:4000px; /* 保留你原本給的大尺寸 */
-      transform-origin:0 0;
-      will-change:transform;
-      -webkit-user-select:none;
-      user-select:none;
-    }
+  const activeItem = links.find((l) => l.id === activeId) || links[0];
 
-    /* iframe 放在 wrapper 中 */
-    .frame-wrap {
-      position:relative;
-      width:100%;
-      height:100%;
-      pointer-events: auto; /* JS 會在必要時切換 */
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      pointer-events: auto; /* JS 控制 enable/disable */
-    }
-
-    /* 右側廣告 */
-    aside{
-      background:#fafafa;
-      padding:16px;
-      border-left:1px solid #ddd;
-      overflow-y:auto;
-    }
-    .ad-box{background:#e8e8e8;padding:10px;margin-bottom:10px;text-align:center}
-
-    /* 自訂垂直捲軸（floating inside crop，右側） */
-    .v-scrollbar {
-      position:absolute;
-      right:6px;
-      top:6px;
-      bottom:6px;
-      width:12px;
-      border-radius:8px;
-      background: rgba(0,0,0,0.06);
-      display:flex;
-      align-items:flex-start;
-      z-index:40;
-      touch-action: none;
-    }
-    .v-scrollbar .thumb {
-      margin:0 auto;
-      width:8px;
-      border-radius:6px;
-      background: rgba(0,0,0,0.28);
-      min-height:28px;
-      transform: translateY(0);
-      transition: background 120ms;
-      touch-action: none;
-    }
-    .v-scrollbar .thumb:active { background: rgba(0,0,0,0.4); }
-
-    /* 在 hover 時突出捲軸（桌機） */
-    .crop:hover .v-scrollbar { background: rgba(0,0,0,0.08); }
-    .crop:hover .v-scrollbar .thumb { background: rgba(0,0,0,0.34); }
-
-    /* 手機：保留相同行為（不要改成原頁面） */
-    @media (max-width:768px){
-      body{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;height:100vh;overflow:hidden}
-      nav{border-bottom:1px solid #ddd}
-      aside{display:none} /* 手機版可以隱藏側欄讓預覽更大，若不想請移除這行 */
-      main{height:100vh}
-      /* 保持 crop 行為一致（不要把 wrapper 的 transform 關掉） */
-      .crop{position:relative;height:100vh; touch-action: none; cursor: grab}
-      .wrapper{position:absolute; width:4000px; height:4000px; transform-origin:0 0}
-      .frame-wrap{height:100%}
-      iframe{height:100%}
-    }
-  </style>
-</head>
-<body>
-  <nav>
-    <h3>網站導覽</h3>
-    <a href="https://www.google.com" target="_blank">Google</a>
-    <a href="https://www.youtube.com" target="_blank">YouTube</a>
-    <a href="https://www.jljh.com.tw/" target="_blank">公司官網</a>
-  </nav>
-
-  <main>
-    <div class="crop" id="crop">
-      <div class="wrapper" id="wrapper">
-        <div class="frame-wrap">
-          <iframe
-            id="theIframe"
-            src="https://www.jljh.com.tw/usedcust/index.php?mkind=1&list_bno=BD&list_area=A&cate_no=&mnotea=&bagok=%E6%90%9C%E5%B0%8B"
-            title="公司商品列表"
-            scrolling="no">
-          </iframe>
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      {/* Top bar for small screen to toggle left nav */}
+      <header className="sm:hidden bg-white shadow-sm sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              aria-label="切換選單"
+              className="p-2 rounded-md hover:bg-gray-100"
+              onClick={() => setSidebarOpen((s) => !s)}
+            >
+              <Menu size={20} />
+            </button>
+            <h1 className="text-lg font-semibold">我的三欄網頁</h1>
+          </div>
+          <div className="text-sm text-gray-600">廣告區</div>
         </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-[220px_1fr_300px] gap-6">
+        {/* Left: Navigation */}
+        <aside
+          className={`bg-white rounded-2xl shadow-sm p-3 transition-transform duration-200 ${
+            sidebarOpen ? 'translate-x-0' : 'sm:translate-x-0 -translate-x-0'
+          }`}
+          aria-label="主要連結選單"
+        >
+          <nav className="space-y-2">
+            {links.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => {
+                  setActiveId(link.id);
+                  setSidebarOpen(false); // auto-close on mobile
+                }}
+                className={`w-full text-left rounded-lg px-3 py-2 flex items-center justify-between focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                  activeId === link.id
+                    ? 'bg-indigo-600 text-white shadow'
+                    : 'hover:bg-gray-100 text-gray-800'
+                }`}
+                aria-current={activeId === link.id ? 'page' : undefined}
+              >
+                <span className="font-medium">{link.label}</span>
+                <span className="text-xs text-gray-400">›</span>
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-4 text-xs text-gray-500">
+            提示：點擊左側項目，內容會顯示在中間區塊。
+          </div>
+        </aside>
+
+        {/* Center: Content area */}
+        <main className="bg-white rounded-2xl shadow p-6 min-h-[320px]">
+          <header className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold">{activeItem.label}</h2>
+              <p className="text-sm text-gray-500 mt-1">目前顯示：{activeItem.id}</p>
+            </div>
+            <div className="text-sm text-gray-500">可放置分享按鈕 / 功能按鈕</div>
+          </header>
+
+          <section className="mt-6">
+            <AnimatePresence mode="wait">
+              <motion.article
+                key={activeItem.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22 }}
+                className="prose max-w-none"
+              >
+                <p className="text-gray-700">{activeItem.summary}</p>
+
+                {/* Example extended content for demo */}
+                <div className="mt-4 space-y-3">
+                  <p>
+                    這裡可以放長內容：圖片、文章、表格或其他互動元件。你也可以把不同連結對應到後端 API，點擊時用 fetch 載入真實資料。
+                  </p>
+
+                  <div className="rounded-lg border p-3 bg-gray-50">
+                    <strong>範例區塊：</strong>
+                    <p className="text-sm text-gray-600 mt-1">示範內容卡片 — 可替換為動態內容。</p>
+                  </div>
+                </div>
+
+                {/* Optional: more content so the area looks realistic */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold">相關項目</h3>
+                  <ul className="list-disc ml-5 mt-2 text-gray-700">
+                    <li>子項目 A</li>
+                    <li>子項目 B</li>
+                    <li>子項目 C</li>
+                  </ul>
+                </div>
+              </motion.article>
+            </AnimatePresence>
+          </section>
+        </main>
+
+        {/* Right: Ads / Promo area */}
+        <aside className="hidden sm:block">
+          <div className="space-y-4 sticky top-6">
+            <div className="bg-white rounded-2xl shadow-sm p-4 text-sm">
+              <div className="font-semibold">廣告 / 推廣</div>
+              <p className="mt-2 text-gray-600 text-xs">放置橫幅、互動廣告或聯盟廣告位置。</p>
+
+              <div className="mt-3 grid gap-3">
+                <div className="border rounded-lg p-3 text-center">廣告 300×250</div>
+                <div className="border rounded-lg p-3 text-center">廣告 300×250</div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm p-4 text-sm">
+              <div className="font-semibold">推薦內容</div>
+              <ul className="mt-2 text-gray-700 text-sm space-y-2">
+                <li className="hover:text-indigo-600">推薦文章 A</li>
+                <li className="hover:text-indigo-600">推薦工具 B</li>
+                <li className="hover:text-indigo-600">推薦課程 C</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
       </div>
 
-      <!-- 自訂捲軸 -->
-      <div class="v-scrollbar" id="vscroll" aria-hidden="true">
-        <div class="thumb" id="thumb"></div>
-      </div>
+      {/* Footer */}
+      <footer className="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">
+        © {new Date().getFullYear()} 我的網站範例。可依需求修改樣式與資料來源。
+      </footer>
     </div>
-  </main>
-
-  <aside>
-    <h3>廣告區</h3>
-    <div class="ad-box">廣告 1</div>
-    <div class="ad-box">廣告 2</div>
-    <div class="ad-box">廣告 3</div>
-  </aside>
-
-  <script>
-    /* -------------------------
-      參數
-    ------------------------- */
-    const tx = -1706;       // 水平固定位移
-    const speedWheel = 0.8; // 滾輪速度
-    const MIN_THUMB = 28;   // 最小 thumb 高度（像素）
-
-    /* DOM */
-    const crop = document.getElementById('crop');
-    const wrapper = document.getElementById('wrapper');
-    const iframe = document.getElementById('theIframe');
-    const vscroll = document.getElementById('vscroll');
-    const thumb = document.getElementById('thumb');
-
-    /* 狀態 */
-    let ty = 0;
-    let tyMin = 0;
-    let tyMax = 0;
-    let isDragging = false;
-    let startY = 0;
-    let startTy = 0;
-
-    /* scrollbar 狀態 */
-    let draggingThumb = false;
-    let thumbStartY = 0;
-    let thumbStartTop = 0;
-    let thumbHeight = MIN_THUMB;
-    let trackHeight = 0;
-
-    function clamp(v, a, b){ return Math.min(Math.max(v, a), b); }
-
-    function applyTransform(){
-      wrapper.style.transform = `translate(${Math.round(tx)}px, ${Math.round(ty)}px)`;
-      updateThumbPosition();
-    }
-
-    /* 計算 ty 範圍與捲軸尺寸 */
-    function updateBoundsAndThumb(){
-      const cropH = crop.clientHeight;
-      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
-
-      tyMax = 0;
-      tyMin = Math.min(0, cropH - wrapperH); // 負數或 0
-      ty = clamp(ty, tyMin, tyMax);
-
-      // track 可用高度（捲軸上下內邊距已在 CSS 設 6px）
-      trackHeight = Math.max(20, vscroll.clientHeight);
-      // thumb 高度依比例計算
-      if (wrapperH <= 0) {
-        thumbHeight = MIN_THUMB;
-      } else {
-        const ratio = cropH / wrapperH;
-        thumbHeight = Math.max(MIN_THUMB, Math.round(trackHeight * ratio));
-      }
-      thumb.style.height = thumbHeight + 'px';
-
-      applyTransform();
-    }
-
-    function updateThumbPosition(){
-      const cropH = crop.clientHeight;
-      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
-      if (wrapperH <= cropH) {
-        // 內容未溢出：收起或隱藏 thumb（但為簡單，縮到最小）
-        thumb.style.opacity = 0.35;
-        thumb.style.transform = `translateY(0px)`;
-        return;
-      } else {
-        thumb.style.opacity = 1;
-      }
-      const scrollRange = wrapperH - cropH;
-      const thumbRange = trackHeight - thumbHeight;
-      const progress = ( -ty ) / ( scrollRange || 1 ); // 0..1
-      const thumbTop = clamp(Math.round(progress * thumbRange), 0, thumbRange);
-      thumb.style.transform = `translateY(${thumbTop}px)`;
-    }
-
-    /* 當使用滑鼠或觸控在 crop 上時，暫時關閉 iframe pointer-events */
-    let savedIframePointer = iframe.style.pointerEvents || 'auto';
-    function disableIframePointer(){ iframe.style.pointerEvents = 'none'; }
-    function enableIframePointer(){ iframe.style.pointerEvents = savedIframePointer || 'auto'; }
-
-    /* wheel 支援（桌機） */
-    crop.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      disableIframePointer();
-      const delta = e.deltaY * speedWheel;
-      ty -= delta;
-      ty = clamp(ty, tyMin, tyMax);
-      applyTransform();
-      // 在 wheel 停後短暫還原 pointer，避免一直禁用 iframe（提高互動性）
-      clearTimeout(crop._wheelTimer);
-      crop._wheelTimer = setTimeout(() => enableIframePointer(), 400);
-    }, { passive: false });
-
-    /* 滑鼠拖曳內容（desktop） */
-    crop.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      isDragging = true;
-      startY = e.clientY;
-      startTy = ty;
-      crop.classList.add('dragging');
-      disableIframePointer();
-      e.preventDefault();
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const delta = e.clientY - startY;
-      ty = clamp(startTy + delta, tyMin, tyMax);
-      applyTransform();
-    });
-    window.addEventListener('mouseup', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      crop.classList.remove('dragging');
-      // 若游標仍在 crop，保留 disable（mouseenter/manleave 也處理），否則還原
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (!crop.contains(el)) enableIframePointer();
-    });
-
-    /* 觸控（mobile / tablet） - 在 crop 上 */
-    let touchStartY = 0, touchStartTy = 0;
-    crop.addEventListener('touchstart', (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      disableIframePointer();
-      touchStartY = e.touches[0].clientY;
-      touchStartTy = ty;
-    }, { passive: true });
-
-    crop.addEventListener('touchmove', (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      e.preventDefault && e.preventDefault();
-      const delta = e.touches[0].clientY - touchStartY;
-      ty = clamp(touchStartTy + delta, tyMin, tyMax);
-      applyTransform();
-    }, { passive: false });
-
-    crop.addEventListener('touchend', (e) => {
-      // 延遲還原以避免與短暫點擊互動衝突
-      setTimeout(() => enableIframePointer(), 60);
-    });
-
-    /* mouseenter / leave：控制 iframe pointer（桌機） */
-    crop.addEventListener('mouseenter', () => disableIframePointer());
-    crop.addEventListener('mouseleave', () => enableIframePointer());
-
-    /* -------------------------
-       scrollbar: 拖曳 thumb 或在 track 點擊
-       支援 mouse + touch
-    ------------------------- */
-    // 當點擊 track（vscroll）空白處時，跳到該位置中心
-    vscroll.addEventListener('click', (e) => {
-      // 如果點在 thumb 上，忽略（thumb 自己處理）
-      if (e.target === thumb) return;
-      // relative Y within track
-      const rect = vscroll.getBoundingClientRect();
-      const y = e.clientY - rect.top;
-      const len = trackHeight - thumbHeight;
-      const thumbTop = clamp(y - thumbHeight/2, 0, len);
-      // 轉成 ty
-      const cropH = crop.clientHeight;
-      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
-      const scrollRange = wrapperH - cropH;
-      const progress = (len === 0) ? 0 : thumbTop / len;
-      ty = - Math.round(progress * scrollRange);
-      ty = clamp(ty, tyMin, tyMax);
-      applyTransform();
-    });
-
-    // thumb mouse drag
-    thumb.addEventListener('mousedown', (e) => {
-      e.stopPropagation();
-      draggingThumb = true;
-      thumbStartY = e.clientY;
-      // parse current transform translateY to get top (we use computed by updateThumbPosition instead)
-      thumbStartTop = parseInt(thumb.style.transform.replace(/[^\d-]/g,'')) || 0;
-      disableIframePointer();
-      document.body.classList.add('no-select');
-      e.preventDefault();
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (!draggingThumb) return;
-      const delta = e.clientY - thumbStartY;
-      const newTop = clamp(thumbStartTop + delta, 0, Math.max(0, trackHeight - thumbHeight));
-      // convert to ty
-      const cropH = crop.clientHeight;
-      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
-      const len = trackHeight - thumbHeight;
-      const progress = len === 0 ? 0 : newTop / len;
-      const scrollRange = Math.max(0, wrapperH - cropH);
-      ty = - Math.round(progress * scrollRange);
-      ty = clamp(ty, tyMin, tyMax);
-      applyTransform();
-    });
-    window.addEventListener('mouseup', (e) => {
-      if (draggingThumb) {
-        draggingThumb = false;
-        enableIframePointer();
-        document.body.classList.remove('no-select');
-      }
-    });
-
-    // thumb touch drag
-    thumb.addEventListener('touchstart', (e) => {
-      if (!e.touches || e.touches.length === 0) return;
-      e.stopPropagation();
-      draggingThumb = true;
-      thumbStartY = e.touches[0].clientY;
-      // 讀目前 transform 的 translateY 值
-      const matrix = window.getComputedStyle(thumb).transform;
-      let curTop = 0;
-      if (matrix && matrix !== 'none') {
-        const vals = matrix.match(/matrix.*\((.+)\)/)[1].split(', ');
-        curTop = parseFloat(vals[5]) || 0;
-      }
-      thumbStartTop = curTop;
-      disableIframePointer();
-    }, { passive: false });
-
-    thumb.addEventListener('touchmove', (e) => {
-      if (!draggingThumb || !e.touches || e.touches.length === 0) return;
-      e.preventDefault();
-      const delta = e.touches[0].clientY - thumbStartY;
-      const newTop = clamp(thumbStartTop + delta, 0, Math.max(0, trackHeight - thumbHeight));
-      const cropH = crop.clientHeight;
-      const wrapperH = wrapper.scrollHeight || wrapper.offsetHeight;
-      const len = trackHeight - thumbHeight;
-      const progress = len === 0 ? 0 : newTop / len;
-      const scrollRange = Math.max(0, wrapperH - cropH);
-      ty = - Math.round(progress * scrollRange);
-      ty = clamp(ty, tyMin, tyMax);
-      applyTransform();
-    }, { passive: false });
-
-    thumb.addEventListener('touchend', (e) => {
-      if (draggingThumb) {
-        draggingThumb = false;
-        setTimeout(() => enableIframePointer(), 40);
-      }
-    });
-
-    /* 初始化與 resize 更新 */
-    function init(){
-      updateBoundsAndThumb();
-    }
-    window.addEventListener('resize', updateBoundsAndThumb);
-    window.addEventListener('orientationchange', updateBoundsAndThumb);
-    iframe.addEventListener('load', () => {
-      // iframe 可能是跨域，scrollHeight 可能不受影響，但我們仍延遲更新一次
-      setTimeout(updateBoundsAndThumb, 180);
-    });
-
-    // 初始化
-    init();
-    window.addEventListener('load', () => setTimeout(updateBoundsAndThumb, 120));
-  </script>
-</body>
-</html>
+  );
+}
