@@ -1,0 +1,38 @@
+<div class="prose max-w-none text-gray-700">
+  
+  <h3 class="text-2xl font-bold text-indigo-700 mb-4">
+    讓惜物成為一種生活態度，讓閒置變成一份驚喜。
+  </h3>
+
+  <p class="mb-4 leading-relaxed">
+    歡迎來到 <strong>蚤激安寄賣小舖</strong>！<br>
+    您家中是否也堆滿了許多「食之無味，棄之可惜」的物品？那些買了很少用、或是充滿回憶卻已不再需要的東西，不該只是佔據空間的負擔，更不該成為地球的垃圾。
+  </p>
+
+  <div class="my-6 bg-gray-100 rounded-lg p-4 text-center text-gray-500 italic border border-dashed border-gray-300">
+    [ 建議此處可放一張店內商品陳列照，讓客人感受尋寶樂趣 ]
+  </div>
+
+  <h4 class="text-xl font-semibold text-gray-800 mt-8 mb-2">我們在做什麼？</h4>
+  <p class="mb-4">
+    我們是一家致力於環保與資源循環的二手寄賣店。在這裡，我們相信<span class="bg-yellow-100 px-1 rounded text-yellow-800 font-bold">「世界上沒有絕對的垃圾，只有放錯位置的寶貝」</span>。
+  </p>
+  <p class="mb-4">
+    透過我們的平台，您可以輕鬆將不再需要的物品進行寄賣，讓這些舊物搖身一變，成為其他人眼中的寶藏。這不僅能幫您騰出生活空間，還能將閒置物品換成現金，真正實現<strong>「垃圾變黃金」</strong>！
+  </p>
+
+  <h4 class="text-xl font-semibold text-gray-800 mt-8 mb-2">為什麼選擇蚤激安？</h4>
+  <ul class="list-disc pl-6 space-y-2 mb-6">
+    <li><strong>對於賣家：</strong>輕鬆斷捨離，無痛出清家中雜物，還能獲得額外收入。</li>
+    <li><strong>對於買家：</strong>享受低價尋寶的樂趣，用最實惠的價格買到實用的好物。</li>
+    <li><strong>對於地球：</strong>減少廢棄物，延長物品的使用壽命，為環保盡一份心力。</li>
+  </ul>
+
+  <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500 mt-8">
+    <p class="font-medium text-indigo-900">
+      這是一個充滿驚喜的中繼站，無論您是想為舊愛尋找新主人，還是想來挖掘生活中的小確幸，<br>
+      <strong>蚤激安寄賣小舖</strong>都誠摯歡迎您的光臨！
+    </p>
+  </div>
+
+</div>
