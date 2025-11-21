@@ -190,11 +190,10 @@
       contentTitle.textContent = item.label;
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
-      // ★ 修改重點：這裡判斷如果是 announcement 或 about，都去抓外部檔案
-      if (item.id === 'announcement' || item.id === 'about') {
+      // ★ 修改重點：這裡增加了 contact 的判斷
+      if (item.id === 'announcement' || item.id === 'about' || item.id === 'contact') {
         
-        // 決定要抓哪個檔案名稱
-        const fileName = item.id + '.html'; // 會變成 announcement.html 或 about.html
+        const fileName = item.id + '.html'; 
 
         fetch(fileName)
           .then(res => {
@@ -210,7 +209,7 @@
               </div>`;
           });
       } else {
-        // 其他頁面 (資源、聯絡我們) 維持原本的假文
+        // 資源頁面目前還沒有檔案，維持預設顯示
         contentBody.innerHTML = `
           <p class="text-lg text-gray-700 mb-4">${item.summary}</p>
           <div class="h-64 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
@@ -249,4 +248,5 @@
   </script>
 </body>
 </html>
+
 
