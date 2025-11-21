@@ -246,7 +246,39 @@
     renderNav();
     updateContent();
   </script>
+
+  <div id="floating-ad" class="fixed bottom-4 right-4 z-50 flex flex-col items-end transition-transform duration-300 translate-y-0">
+    
+    <button onclick="closeAd()" class="mb-2 bg-gray-800 text-white rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-gray-600 text-xs">
+      ✕
+    </button>
+
+    <a href="https://line.me/R/ti/p/@041ypvvx?oat_content=qr" target="_blank" class="block bg-white p-2 rounded-lg shadow-xl border border-gray-200 hover:scale-105 transition-transform">
+      
+      <div class="w-40 text-center">
+        <p class="text-sm font-bold text-indigo-600 mb-1">加入 LINE 好友</p>
+        <p class="text-xs text-gray-500">預約取款更方便！</p>
+        </div>
+
+    </a>
+  </div>
+
+  <script>
+    // --- 懸浮廣告的控制功能 ---
+    function closeAd() {
+      const ad = document.getElementById('floating-ad');
+      // 加上 translate-y-full 把它往下推出去隱藏
+      ad.classList.add('translate-y-40', 'opacity-0');
+      
+      // 設定一個短暫延遲後完全隱藏 (避免擋到點擊)
+      setTimeout(() => {
+        ad.classList.add('hidden');
+      }, 300);
+    }
+  </script>
+  
 </body>
 </html>
+
 
 
