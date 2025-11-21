@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>三欄範例（靜態）</title>
+  <title>蚤激安寄賣小舖</title>
 
-  <!-- Tailwind Play CDN (適合 demo / 小專案，不建議生產用大量客製) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* small extra styling for prose-like content */
     .prose p { line-height: 1.6; color: #374151; }
+    /* 增加一個 loading 的簡單樣式 */
+    .loading { color: #6b7280; font-style: italic; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen">
@@ -18,35 +18,30 @@
     <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="menu-toggle" class="p-2 rounded-md hover:bg-gray-100">☰</button>
-        <h1 class="text-lg font-semibold">我的三欄網頁</h1>
+        <h1 class="text-lg font-semibold">蚤激安寄賣小舖</h1>
       </div>
       <div class="text-sm text-gray-600">廣告區</div>
     </div>
   </header>
 
   <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-[220px_1fr_300px] gap-6">
-    <!-- 左側 -->
     <aside id="left-nav" class="bg-white rounded-2xl shadow-sm p-3">
       <nav id="nav-list" class="space-y-2"></nav>
-      <div class="mt-4 text-xs text-gray-500">提示：點擊左側項目，內容會顯示在中間區塊。</div>
+      <div class="mt-4 text-xs text-gray-500">提示：點擊「登入」將開啟新視窗。</div>
     </aside>
 
-    <!-- 中間內容 -->
     <main id="content" class="bg-white rounded-2xl shadow p-6 min-h-[320px]">
       <header class="flex items-start justify-between gap-4">
         <div>
-          <h2 id="content-title" class="text-2xl font-bold">首頁</h2>
-          <p id="content-sub" class="text-sm text-gray-500 mt-1">目前顯示：home</p>
+          <h2 id="content-title" class="text-2xl font-bold">標題</h2>
+          <p id="content-sub" class="text-sm text-gray-500 mt-1">...</p>
         </div>
-        <div class="text-sm text-gray-500">可放置分享按鈕 / 功能按鈕</div>
       </header>
 
       <section id="content-body" class="mt-6 prose">
-        <p>歡迎 — 點左側連結來切換內容。</p>
-      </section>
+        </section>
     </main>
 
-    <!-- 右側廣告 -->
     <aside class="hidden sm:block">
       <div class="space-y-4 sticky top-6">
         <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
@@ -54,8 +49,6 @@
           <p class="mt-2 text-gray-600 text-xs">放置橫幅或聯盟廣告位置。</p>
           <div class="mt-3 grid gap-3">
             <div class="border rounded-lg p-3 text-center">廣告 300×250</div>
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2506175077128539"
-     crossorigin="anonymous"></script>
             <div class="border rounded-lg p-3 text-center">廣告 300×250</div>
           </div>
         </div>
@@ -63,23 +56,34 @@
         <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
           <div class="font-semibold">推薦內容</div>
           <ul class="mt-2 text-gray-700 text-sm space-y-2">
-            <li class="hover:text-indigo-600">推薦文章 A</li>
-            <li class="hover:text-indigo-600">推薦工具 B</li>
-            <li class="hover:text-indigo-600">推薦課程 C</li>
+            <li class="hover:text-indigo-600 cursor-pointer">推薦文章 A</li>
+            <li class="hover:text-indigo-600 cursor-pointer">推薦工具 B</li>
           </ul>
         </div>
       </div>
     </aside>
   </div>
 
-  <footer class="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">© <span id="year"></span> 我的網站範例。</footer>
+  <footer class="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">© <span id="year"></span> 蚤激安寄賣小舖</footer>
 
   <script>
-    // 動態資料（可改成 fetch 從外部 JSON 讀）
+    // --- 設定區 ---
+    
+    // 定義選單資料
     const links = [
-      { id: 'home', label: '首頁', summary: '歡迎來到首頁 — 這裡放置介紹、精選內容或公告。' },
+      { 
+        id: 'login', 
+        label: '登入', 
+        //這是一個外部連結，不是內部頁面
+        isExternal: true, 
+        url: 'https://www.jljh.com.tw/usedcust/index.php?t=1&npg=' 
+      },
+      { 
+        id: 'announcement', 
+        label: '最新公告', 
+        summary: '這裡是最新公告區，內容將從 announcement.html 載入。' 
+      },
       { id: 'about', label: '關於我們', summary: '關於本網站的背景故事、團隊或聯絡資訊。' },
-      { id: 'articles', label: '文章', summary: '文章列表／精選文章摘要。' },
       { id: 'resources', label: '資源', summary: '下載、工具連結或常見問答 (FAQ)。' },
       { id: 'contact', label: '聯絡我們', summary: '聯絡表單或客服資訊。' },
     ];
@@ -92,68 +96,106 @@
 
     yearSpan.textContent = new Date().getFullYear();
 
-    let activeId = 'home';
+    // 設定預設顯示的頁面 (因為首頁變成登入了，所以預設改成顯示最新公告)
+    let activeId = 'announcement';
 
+    // --- 渲染左側選單 ---
     function renderNav() {
       navList.innerHTML = '';
       links.forEach(link => {
         const btn = document.createElement('button');
         btn.className = [
           'w-full', 'text-left', 'rounded-lg', 'px-3', 'py-2', 'flex', 'items-center', 'justify-between',
-          'focus:outline-none'
+          'focus:outline-none', 'transition-colors'
         ].join(' ');
-        btn.dataset.id = link.id;
+        
         btn.innerHTML = `<span class="font-medium">${link.label}</span><span class="text-xs text-gray-400">›</span>`;
-        if (activeId === link.id) {
+
+        // 樣式判斷：如果是當前頁面且不是外部連結
+        if (activeId === link.id && !link.isExternal) {
           btn.classList.add('bg-indigo-600', 'text-white', 'shadow');
         } else {
           btn.classList.add('hover:bg-gray-100', 'text-gray-800');
         }
+
+        // 點擊事件
         btn.addEventListener('click', () => {
-          activeId = link.id;
-          updateContent();
-          renderNav();
-          // close mobile menu if open
-          if (window.innerWidth < 640) leftNav.classList.remove('translate-x-0');
+          if (link.isExternal) {
+            // 如果是外部連結 (登入)，開新視窗
+            window.open(link.url, '_blank');
+          } else {
+            // 如果是內部頁面，切換內容
+            activeId = link.id;
+            updateContent();
+            renderNav(); // 重新渲染按鈕樣式
+            // 手機版點選後自動收合選單
+            if (window.innerWidth < 640) leftNav.classList.remove('translate-x-0');
+          }
         });
         navList.appendChild(btn);
       });
     }
 
+    // --- 更新中間內容 ---
     function updateContent() {
-      const item = links.find(l => l.id === activeId) || links[0];
+      const item = links.find(l => l.id === activeId);
+      if (!item) return;
+
       contentTitle.textContent = item.label;
       contentSub.textContent = '目前顯示：' + item.id;
-      contentBody.innerHTML = `
-        <p>${item.summary}</p>
-        <div class="mt-4 space-y-3">
-          <div class="rounded-lg border p-3 bg-gray-50"><strong>範例區塊：</strong>
-            <p class="text-sm text-gray-600 mt-1">示範內容卡片 — 可替換為動態內容。</p>
+      
+      // 清空內容並顯示載入中...
+      contentBody.innerHTML = '<p class="loading">載入中...</p>';
+
+      // 特別處理：如果是「最新公告」，去抓取 announcement.html
+      if (item.id === 'announcement') {
+        fetch('announcement.html')
+          .then(response => {
+            if (!response.ok) throw new Error("找不到檔案");
+            return response.text();
+          })
+          .then(html => {
+            contentBody.innerHTML = html;
+          })
+          .catch(err => {
+            // 如果抓不到檔案 (例如檔案還沒上傳)，顯示備用文字
+            console.warn('載入失敗:', err);
+            contentBody.innerHTML = `
+              <div class="p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200">
+                <p><strong>系統提示：</strong>尚未建立 <code>announcement.html</code> 檔案。</p>
+                <p class="text-sm mt-1">請在 GitHub 上傳該檔案，內容就會顯示在這裡。</p>
+                <hr class="my-2 border-yellow-200">
+                <p>${item.summary}</p>
+              </div>
+            `;
+          });
+      } else {
+        // 其他頁面顯示預設內容 (這裡維持原本的範例)
+        contentBody.innerHTML = `
+          <p>${item.summary}</p>
+          <div class="mt-4 space-y-3">
+            <div class="rounded-lg border p-3 bg-gray-50">
+              <strong>範例區塊：</strong>
+              <p class="text-sm text-gray-600 mt-1">這是 ${item.label} 的預設內容。</p>
+            </div>
           </div>
-        </div>
-        <div class="mt-6">
-          <h3 class="text-lg font-semibold">相關項目</h3>
-          <ul class="list-disc ml-5 mt-2 text-gray-700">
-            <li>子項目 A</li>
-            <li>子項目 B</li>
-            <li>子項目 C</li>
-          </ul>
-        </div>`;
+        `;
+      }
     }
 
-    // mobile toggle
+    // --- 手機版選單切換 ---
     const leftNav = document.getElementById('left-nav');
     document.getElementById('menu-toggle').addEventListener('click', () => {
       leftNav.classList.toggle('-translate-x-full');
       leftNav.classList.toggle('translate-x-0');
     });
 
-    // init
-    leftNav.classList.add('translate-x-0'); // ensure visible on desktop
+    // 初始化
+    leftNav.classList.add('translate-x-0'); 
     renderNav();
-    updateContent();
+    updateContent(); // 初始載入
 
-    // accessibility: close nav if clicked outside on narrow screens
+    // 點擊外部關閉選單 (手機版)
     document.addEventListener('click', (e) => {
       if (window.innerWidth < 640) {
         const withinNav = e.target.closest('#left-nav') || e.target.closest('#menu-toggle');
@@ -166,4 +208,3 @@
   </script>
 </body>
 </html>
-
