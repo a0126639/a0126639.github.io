@@ -12,13 +12,13 @@
        ★ 這裡是尺寸調整區 (新手請改這裡) ★
        ========================================= */
     :root {
-      /* 1. 上方導覽列的高度 (建議 50px ~ 80px) */
+      /* 1. 上方導覽列的高度 */
       --nav-height: 60px; 
 
-      /* 2. 右側廣告區的寬度 (建議 250px ~ 350px) */
+      /* 2. 右側廣告區的寬度 */
       --right-sidebar-width: 300px;
 
-      /* 3. 中間內容區的「最小」高度 (若內容很少時的高度) */
+      /* 3. 中間內容區的「最小」高度 */
       --content-min-height: 600px;
     }
 
@@ -77,7 +77,6 @@
       <header class="flex items-start justify-between gap-4 border-b pb-4 mb-4">
         <div>
           <h2 id="content-title" class="text-2xl font-bold">標題</h2>
-          <p id="content-sub" class="text-sm text-gray-500 mt-1">...</p>
         </div>
       </header>
 
@@ -86,12 +85,13 @@
     </main>
 
     <aside class="hidden sm:block custom-right-width flex-shrink-0">
-      <div class="space-y-4 sticky top-20"> <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
+      <div class="space-y-4 sticky top-20"> 
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
           <div class="font-semibold text-lg mb-2">廣告專區</div>
           <div class="bg-gray-100 border rounded-lg h-60 flex items-center justify-center text-gray-400">
              廣告 (300x250)
           </div>
-          </div>
+        </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
           <div class="font-semibold mb-2">推薦連結</div>
@@ -132,19 +132,19 @@
     const navList = document.getElementById('nav-list');
     const mobileNavList = document.getElementById('mobile-nav-list');
     const contentTitle = document.getElementById('content-title');
-    const contentSub = document.getElementById('content-sub');
+    // 移除了 contentSub 變數
     const contentBody = document.getElementById('content-body');
     document.getElementById('year').textContent = new Date().getFullYear();
 
     let activeId = 'announcement'; // 預設顯示
 
-    // --- 產生按鈕 (同時產生桌機版與手機版) ---
+    // --- 產生按鈕 ---
     function renderNav() {
       navList.innerHTML = '';
       mobileNavList.innerHTML = '';
 
       links.forEach(link => {
-        // 1. 建立桌機版按鈕 (橫向)
+        // 1. 桌機版按鈕
         const btn = document.createElement('button');
         btn.className = 'px-3 py-2 text-sm font-medium transition-all hover:text-indigo-600 h-full border-b-2 border-transparent';
         btn.textContent = link.label;
@@ -155,26 +155,24 @@
           btn.classList.add('text-gray-600');
         }
         
-        // 綁定點擊事件 (桌機)
         btn.addEventListener('click', () => handleClick(link));
         navList.appendChild(btn);
 
-        // 2. 建立手機版按鈕 (直向)
+        // 2. 手機版按鈕
         const mBtn = document.createElement('button');
         mBtn.className = 'w-full text-left px-4 py-3 rounded hover:bg-gray-100 border-b border-gray-100';
         mBtn.textContent = link.label;
         if (activeId === link.id && !link.isExternal) mBtn.classList.add('text-indigo-600', 'font-bold', 'bg-gray-50');
         
-        // 綁定點擊事件 (手機)
         mBtn.addEventListener('click', () => {
             handleClick(link);
-            toggleMobileMenu(false); // 點擊後關閉手機選單
+            toggleMobileMenu(false);
         });
         mobileNavList.appendChild(mBtn);
       });
     }
 
-    // --- 處理點擊邏輯 ---
+    // --- 點擊邏輯 ---
     function handleClick(link) {
       if (link.isExternal) {
         window.open(link.url, '_blank');
@@ -191,7 +189,7 @@
       if (!item) return;
 
       contentTitle.textContent = item.label;
-      contentSub.textContent = '位置：' + item.id;
+      // 移除了 contentSub.textContent = ... 的更新動作
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
       if (item.id === 'announcement') {
@@ -226,7 +224,6 @@
     function toggleMobileMenu(show) {
       if (show) {
         mobileMenu.classList.remove('hidden');
-        // 小延遲讓動畫生效
         setTimeout(() => mobileMenu.classList.remove('-translate-x-full'), 10);
       } else {
         mobileMenu.classList.add('-translate-x-full');
@@ -237,7 +234,6 @@
     document.getElementById('menu-toggle').addEventListener('click', () => toggleMobileMenu(true));
     document.getElementById('menu-close').addEventListener('click', () => toggleMobileMenu(false));
     
-    // 點擊黑色遮罩關閉
     mobileMenu.addEventListener('click', (e) => {
       if (e.target === mobileMenu) toggleMobileMenu(false);
     });
@@ -248,4 +244,3 @@
   </script>
 </body>
 </html>
-
