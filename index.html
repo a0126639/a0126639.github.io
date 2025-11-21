@@ -183,17 +183,20 @@
       }
     }
 
-    // --- 更新內容 ---
-    function updateContent() {
+  function updateContent() {
       const item = links.find(l => l.id === activeId);
       if (!item) return;
 
       contentTitle.textContent = item.label;
-      // 移除了 contentSub.textContent = ... 的更新動作
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
-      if (item.id === 'announcement') {
-        fetch('announcement.html')
+      // ★ 修改重點：這裡判斷如果是 announcement 或 about，都去抓外部檔案
+      if (item.id === 'announcement' || item.id === 'about') {
+        
+        // 決定要抓哪個檔案名稱
+        const fileName = item.id + '.html'; // 會變成 announcement.html 或 about.html
+
+        fetch(fileName)
           .then(res => {
             if(!res.ok) throw new Error('Missing file');
             return res.text();
@@ -202,12 +205,12 @@
           .catch(() => {
             contentBody.innerHTML = `
               <div class="p-4 bg-blue-50 text-blue-800 rounded border border-blue-200">
-                尚未建立 announcement.html，請至 GitHub 上傳檔案。<br>
+                尚未建立 ${fileName}，請至 GitHub 上傳檔案。<br>
                 <span class="text-xs text-gray-500">(${item.summary})</span>
               </div>`;
           });
       } else {
-        // 預設假文
+        // 其他頁面 (資源、聯絡我們) 維持原本的假文
         contentBody.innerHTML = `
           <p class="text-lg text-gray-700 mb-4">${item.summary}</p>
           <div class="h-64 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
@@ -217,6 +220,8 @@
       }
     }
 
+
+    
     // --- 手機版選單開關 ---
     const mobileMenu = document.getElementById('mobile-menu');
     const menuContent = document.getElementById('mobile-menu-content');
@@ -244,3 +249,4 @@
   </script>
 </body>
 </html>
+
