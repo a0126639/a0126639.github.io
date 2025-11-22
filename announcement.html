@@ -1,85 +1,40 @@
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>最新公告</title>
+<div class="space-y-8">
+  
+  <section class="prose max-w-none text-base text-gray-800">
+    <ol class="list-decimal pl-5 font-medium text-red-700 space-y-2">
+      <li>※ 新拒收商品已更新，請各位會員寄賣前請務必確認您的物品是否屬於拒收範圍。</li>
+      <li>※ 下架之商品請盡快取回，逾期將視商品狀況以捐款戶繼續販售或回收。</li>
+      <li>※ 超過50CM的大型商品暫時停收。</li>
+      <li>※ 即日起任何金額取款都需前一天預約。如無法預約日取款，可用LINE告知。</li>
+      <li>※ 寄賣會員請注意，店內不寄賣衣服、鞋子，請不要拿來哦！</li>
+    </ol>
+  </section>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-lg font-semibold mb-2 text-red-600">重要說明 — 拒收 / 限收商品</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      以下為店家公告之「拒收 / 限收商品」。寄賣前請務必確認您的物品是否屬於拒收範圍，以免造成處理成本或直接捐贈、回收處置。
+    </p>
 
-  <style>
-    /* 印刷優化 */
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    @media print {
-      header, footer, .no-print { display: none !important; }
-      body { background: white; }
-    }
-    /* 列表間距調整 */
-    .rule-list li { margin-bottom: 0.6rem; }
-  </style>
-</head>
-<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
-
-  <header class="bg-white shadow-sm py-4">
-    <div class="container mx-auto px-4 flex justify-end">
-       <div class="text-sm text-gray-600">最後更新：2025-11-19</div>
+    <div class="bg-gray-50 border rounded-lg p-4 flex justify-center mb-6">
+      <img src="docs/00.png" alt="拒收限收商品清單" class="max-w-full h-auto shadow-sm rounded" />
     </div>
-  </header>
 
-  <main class="container mx-auto px-4 py-8 flex-grow">
+    <p class="text-gray-700">感謝您的閱讀！</p>
 
-    <section class="prose text-base text-gray-800 mb-8">
-        <ol class="rule-list list-decimal pl-5 font-medium text-red-700">
-          <li>※ 新拒收商品已更新，請各位會員寄賣前請務必確認您的物品是否屬於拒收範圍。</li>
-          <li>※ 下架之商品請盡快取回，逾期將視商品狀況以捐款戶繼續販售或回收。</li>
-          <li>※ 超過50CM的大型商品暫時停收。</li>
-          <li>※ 即日起任何金額取款都需前一天預約。如無法預約日取款，可用LINE告知。</li>
-          <li>※ 寄賣會員請注意，店內不寄賣衣服、鞋子，請不要拿來哦！</li>
-        </ol>
-    </section>
+    <hr class="my-8 border-gray-200">
 
-    <article class="bg-white rounded-2xl shadow p-6">
-        <h3 class="text-lg font-semibold mb-2 text-red-600">重要說明 — 拒收 / 限收商品</h3>
-        <p class="text-sm text-gray-600 mb-3">
-          以下為店家公告之「拒收 / 限收商品」。寄賣前請務必確認您的物品是否屬於拒收範圍，以免造成處理成本或直接捐贈、回收處置。
-        </p>
-
-        <div class="bg-gray-50 border rounded-lg p-4 flex justify-center">
-          <img src="docs/00.png" alt="拒收限收商品清單" class="max-w-full h-auto shadow-sm rounded" />
-        </div>
-        <p>感謝您的閱讀！</p>
-
-<hr class="my-8 border-gray-300">
-
-<div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg text-center mt-6">
-  <h3 class="text-xl font-bold text-indigo-900 mb-2">想看更多精選商品？</h3>
-  <p class="text-indigo-700 mb-4">歡迎前往我們的官方網站，探索更多寶藏！</p>
-  
-  <a href="https://您的公司官網網址.com" target="_blank" 
-     class="inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-transform duration-200">
-    👉 立即前往公司官網
-  </a>
-  
-  <p class="text-xs text-gray-500 mt-2">點擊將開啟新視窗</p>
-</div>
-      </section>
+    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg text-center">
+      <h3 class="text-xl font-bold text-indigo-900 mb-2">想看更多精選商品？</h3>
+      <p class="text-indigo-700 mb-4">歡迎前往我們的官方網站，探索更多寶藏！</p>
       
-    </article>
-  </main>
-
-  <footer class="bg-white border-t mt-8">
-    <div class="container mx-auto px-4 py-6 text-xs text-gray-500 text-center">
-      © <span id="year"></span> 蚤激安寄賣小舖 版權所有。
+      <a href="https://您的公司官網網址.com" target="_blank" 
+         class="inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-transform duration-200">
+        👉 立即前往公司官網
+      </a>
+      
+      <p class="text-xs text-gray-500 mt-2">點擊將開啟新視窗</p>
     </div>
-  </footer>
+  </article>
 
-  <script>
-    // 只保留頁尾年份自動更新 (這通常不需要手動改)
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-  
-</body>
-</html>
-
-
-
+</div>
