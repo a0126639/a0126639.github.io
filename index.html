@@ -127,6 +127,7 @@
         id: 'login', 
         label: '登入', 
         isExternal: true, 
+        // ★ 請確認這裡前後只有一個單引號，不要有雙引號或空白
         url: 'https://www.jljh.com.tw/usedcust/index.php?t=1&npg=' 
       },
       { 
@@ -144,7 +145,18 @@
     const contentBody = document.getElementById('content-body');
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    let activeId = 'announcement'; // 預設顯示
+    // ==========================================
+    // ★ 新增功能：網址錨點偵測 (Deep Linking)
+    // ==========================================
+    // 1. 抓取網址後面的 #字串 (例如 #rule)
+    const hash = window.location.hash.replace('#', '');
+    
+    // 2. 檢查這個 id 是否存在於我們的清單中
+    const targetItem = links.find(l => l.id === hash);
+
+    // 3. 如果有找到且不是外部連結，就設定為該頁面；否則預設為 announcement
+    let activeId = (targetItem && !targetItem.isExternal) ? hash : 'announcement';
+
 
     // --- 產生按鈕 ---
     function renderNav() {
@@ -169,9 +181,16 @@
     // --- 點擊邏輯 ---
     function handleClick(link) {
       if (link.isExternal) {
+        // 外部連結直接開啟
         window.open(link.url, '_blank');
       } else {
+        // 內部頁面切換
         activeId = link.id;
+        
+        // ★ 重點：點擊時，順便把網址改成對應的 #id
+        // 這樣使用者複製網址給別人時，別人也能看到同一頁
+        window.location.hash = link.id;
+
         updateContent();
         renderNav();
       }
@@ -229,4 +248,5 @@
   </script>
 </body>
 </html>
+
 
