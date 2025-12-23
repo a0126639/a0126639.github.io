@@ -148,15 +148,24 @@
 // ==========================================
     // ★ 新增功能：網址錨點偵測 (Deep Linking)
     // ==========================================
-    // 1. 抓取網址後面的 #字串 (例如 #rule)
-    // ★ 修改說明：split('?')[0] 是為了切掉 LINE 自動加上的追蹤碼
-    const hash = window.location.hash.replace('#', '').split('?')[0];
+window.addEventListener('DOMContentLoaded', (event) => {
+    // 獲取原始 Hash
+    let rawHash = window.location.hash; 
     
-    // 2. 檢查這個 id 是否存在於我們的清單中
-    const targetItem = links.find(l => l.id === hash);
+    // 如果 Hash 裡面包含了問號（LINE 常常把參數塞在 Hash 後面）
+    // 例如 #rule?openExternalBrowser=1 -> 只取 rule
+    if (rawHash.includes('?')) {
+        rawHash = rawHash.split('?')[0];
+    }
+    
+    const hash = rawHash.replace('#', '');
 
-    // 3. 如果有找到且不是外部連結，就設定為該頁面；否則預設為 announcement
-    let activeId = (targetItem && !targetItem.isExternal) ? hash : 'announcement';
+    if (hash) {
+        console.log("偵測到錨點:", hash);
+        // 執行你的導向或顯示邏輯
+        showPage(hash); 
+    }
+});
 
 
     // --- 產生按鈕 ---
@@ -249,6 +258,7 @@
   </script>
 </body>
 </html>
+
 
 
 
