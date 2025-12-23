@@ -145,11 +145,12 @@
     const contentBody = document.getElementById('content-body');
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ==========================================
+// ==========================================
     // ★ 新增功能：網址錨點偵測 (Deep Linking)
     // ==========================================
     // 1. 抓取網址後面的 #字串 (例如 #rule)
-    const hash = window.location.hash.replace('#', '');
+    // ★ 修改說明：split('?')[0] 是為了切掉 LINE 自動加上的追蹤碼
+    const hash = window.location.hash.replace('#', '').split('?')[0];
     
     // 2. 檢查這個 id 是否存在於我們的清單中
     const targetItem = links.find(l => l.id === hash);
@@ -248,6 +249,7 @@
   </script>
 </body>
 </html>
+
 
 
 
