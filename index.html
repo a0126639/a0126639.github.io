@@ -120,14 +120,13 @@
     </a>
   </div>
 
-  <script>
+<script>
     // --- 資料設定 ---
     const links = [
       { 
         id: 'login', 
         label: '登入', 
         isExternal: true, 
-        // ★ 請確認這裡前後只有一個單引號，不要有雙引號或空白
         url: 'https://www.jljh.com.tw/usedcust/index.php?mkind=1&list_bno=BD&list_area=A&cate_no=&mnotea=&bagok=%E6%90%9C%E5%B0%8B' 
       },
       { 
@@ -145,16 +144,21 @@
     const contentBody = document.getElementById('content-body');
     document.getElementById('year').textContent = new Date().getFullYear();
 
-// ==========================================
-    // ★ 新增功能：網址錨點偵測 (Deep Linking)
     // ==========================================
-// ==========================================
-    // ★ 新增功能：網址錨點偵測 (Deep Linking)
+    // ★ 修正版：網址錨點偵測 (Deep Linking)
     // ==========================================
-    // 1. 抓取網址後面的 #字串 (例如 #rule)
-    // ★ 修改說明：split('?')[0] 是為了切掉 LINE 自動加上的追蹤碼
-    const hash = window.location.hash.replace('#', '').split('?')[0];
     
+    // 1. 抓取網址 Hash 並處理 LINE 可能附加的參數 (例如 #rule?openExternalBrowser=1)
+    const getHashId = () => {
+      const rawHash = window.location.hash.replace('#', '');
+      return rawHash.split('?')[0]; // 切掉問號之後的所有內容
+    };
+
+    // 2. 初始化 activeId：先看網址有沒有 hash，若無或無效則預設 'announcement'
+    const initialHash = getHashId();
+    const isValidHash = links.some(link => link.id === initialHash && !link.isExternal);
+    let activeId = isValidHash ? initialHash : 'announcement';
+
     // --- 產生按鈕 ---
     function renderNav() {
       navList.innerHTML = '';
@@ -178,16 +182,10 @@
     // --- 點擊邏輯 ---
     function handleClick(link) {
       if (link.isExternal) {
-        // 外部連結直接開啟
         window.open(link.url, '_blank');
       } else {
-        // 內部頁面切換
         activeId = link.id;
-        
-        // ★ 重點：點擊時，順便把網址改成對應的 #id
-        // 這樣使用者複製網址給別人時，別人也能看到同一頁
-        window.location.hash = link.id;
-
+        window.location.hash = link.id; // 更新網址 Hash
         updateContent();
         renderNav();
       }
@@ -201,9 +199,7 @@
       contentTitle.textContent = item.label;
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
-      // 如果是這些頁面，讀取外部 HTML 檔案
       if (['announcement', 'about', 'rule', 'contact'].includes(item.id)) {
-        
         const fileName = item.id + '.html'; 
 
         fetch(fileName)
@@ -220,11 +216,10 @@
               </div>`;
           });
       } else {
-        // 其他預設
         contentBody.innerHTML = `
           <p class="text-lg text-gray-700 mb-4">${item.summary}</p>
           <div class="h-64 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-             這裡將顯示 ${item.label} 的詳細內容
+              這裡將顯示 ${item.label} 的詳細內容
           </div>
         `;
       }
@@ -239,12 +234,26 @@
       }, 300);
     }
 
-    // 初始化
+    // 監聽網址 Hash 變化（當使用者點選瀏覽器「上一頁」時也能正確切換）
+    window.addEventListener('hashchange', () => {
+      const newHash = getHashId();
+      if (newHash && newHash !== activeId) {
+        const item = links.find(l => l.id === newHash);
+        if (item) {
+          activeId = newHash;
+          renderNav();
+          updateContent();
+        }
+      }
+    });
+
+    // 初始化執行
     renderNav();
     updateContent();
   </script>
 </body>
 </html>
+
 
 
 
