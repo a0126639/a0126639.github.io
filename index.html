@@ -192,36 +192,31 @@
     }
 
     // --- 更新內容 ---
-    function updateContent() {
-      const item = links.find(l => l.id === activeId);
-      if (!item) return;
-
+   function updateContent() {
+      const item = links.find(l => l.id === activeId) || links[1]; // 備案：找不到就跳到最新公告
+      
       contentTitle.textContent = item.label;
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
       if (['announcement', 'about', 'rule', 'contact'].includes(item.id)) {
         const fileName = item.id + '.html'; 
 
-        fetch(fileName)
+        // 加上時間戳記防止 LINE 快取舊檔案 (?v=...)
+        fetch(`${fileName}?v=${new Date().getTime()}`)
           .then(res => {
             if(!res.ok) throw new Error('Missing file');
             return res.text();
           })
-          .then(html => contentBody.innerHTML = html)
+          .then(html => {
+            contentBody.innerHTML = html;
+          })
           .catch(() => {
             contentBody.innerHTML = `
               <div class="p-4 bg-blue-50 text-blue-800 rounded border border-blue-200">
-                尚未建立 ${fileName}，請至 GitHub 上傳檔案。<br>
-                <span class="text-xs text-gray-500">(${item.summary})</span>
+                載入失敗，請嘗試重新整理頁面。<br>
+                <span class="text-xs text-gray-500">(目標檔案: ${fileName})</span>
               </div>`;
           });
-      } else {
-        contentBody.innerHTML = `
-          <p class="text-lg text-gray-700 mb-4">${item.summary}</p>
-          <div class="h-64 bg-gray-100 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
-              這裡將顯示 ${item.label} 的詳細內容
-          </div>
-        `;
       }
     }
 
@@ -253,6 +248,7 @@
   </script>
 </body>
 </html>
+
 
 
 
