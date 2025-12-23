@@ -148,26 +148,13 @@
 // ==========================================
     // ★ 新增功能：網址錨點偵測 (Deep Linking)
     // ==========================================
-window.addEventListener('DOMContentLoaded', (event) => {
-    // 獲取原始 Hash
-    let rawHash = window.location.hash; 
+// ==========================================
+    // ★ 新增功能：網址錨點偵測 (Deep Linking)
+    // ==========================================
+    // 1. 抓取網址後面的 #字串 (例如 #rule)
+    // ★ 修改說明：split('?')[0] 是為了切掉 LINE 自動加上的追蹤碼
+    const hash = window.location.hash.replace('#', '').split('?')[0];
     
-    // 如果 Hash 裡面包含了問號（LINE 常常把參數塞在 Hash 後面）
-    // 例如 #rule?openExternalBrowser=1 -> 只取 rule
-    if (rawHash.includes('?')) {
-        rawHash = rawHash.split('?')[0];
-    }
-    
-    const hash = rawHash.replace('#', '');
-
-    if (hash) {
-        console.log("偵測到錨點:", hash);
-        // 執行你的導向或顯示邏輯
-        showPage(hash); 
-    }
-});
-
-
     // --- 產生按鈕 ---
     function renderNav() {
       navList.innerHTML = '';
@@ -258,6 +245,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   </script>
 </body>
 </html>
+
 
 
 
