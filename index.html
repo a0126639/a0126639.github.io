@@ -77,13 +77,33 @@
           </div>
         </div>
         
-         <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
-          <div class="font-semibold text-gray-400 text-xs mb-2">店內推薦</div>
-          
-          <a href="docs/welcome.png" target="_blank" class="block group hover:opacity-80 transition-opacity">
-              <img src="docs/welcome.png" alt="店內廣告" class="w-full h-auto rounded shadow-sm">
-          </a>
-        </div>
+<div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
+  <div class="font-semibold text-gray-400 text-xs mb-2">店內推薦</div>
+  
+  <!-- 廣告圖片容器 -->
+  <a href="docs/welcome1.png" id="ad-link" target="_blank" class="block group hover:opacity-80 transition-opacity">
+    <img id="ad-image" src="docs/welcome1.png" alt="店內廣告" class="w-full h-auto rounded shadow-sm">
+  </a>
+</div>
+
+<script>
+  // 設定你的圖片路徑清單（可放入兩張或更多張圖片）
+  const images = [
+    "docs/welcome1.png",
+    "docs/welcome2.png"
+  ];
+  
+  let currentIndex = 0;
+  const imgElement = document.getElementById("ad-image");
+  const linkElement = document.getElementById("ad-link");
+
+  // 設定循環計時器（單位：毫秒，3000 代表每 3 秒切換一次）
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % images.length;
+    imgElement.src = images[currentIndex];
+    linkElement.href = images[currentIndex]; // 點擊時同步切換連結指向的圖片
+  }, 3000);
+</script>
 
         <div class="bg-white rounded-2xl shadow-sm p-4 text-sm">
           <div class="font-semibold mb-3 border-b pb-2">最近貼文</div>
