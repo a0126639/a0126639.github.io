@@ -98,7 +98,7 @@
         <div class="prose max-w-none text-gray-700">
           <p>蚤激安寄賣小舖是位於桃園市桃園區守法路12號1樓的二手寄賣店，營業時間 12:00 ～ 20:30，店休日為星期日，電話 0977-419-557。</p>
           <p>我們提供閒置物品託售代賣：把用不到的物品帶來店裡，由店家建檔、定價、上架販售，售出後依約定比例領取現金。也歡迎來店尋寶，用實惠的價格買到實用的二手好物。</p>
-          <p>本站頁面：最新公告、關於我們、寄賣須知、聯絡我們、隱私權政策（請啟用 JavaScript 以切換瀏覽各頁面內容）。</p>
+          <p>本站頁面：最新公告、激安情報站、關於我們、寄賣須知、聯絡我們、隱私權政策（請啟用 JavaScript 以切換瀏覽各頁面內容）。</p>
         </div>
       </noscript>
     </main>
@@ -164,6 +164,7 @@
   <footer class="bg-white mt-auto border-t py-6 text-center text-sm text-gray-500">
     <nav class="flex flex-wrap justify-center gap-4 mb-3">
       <a href="#announcement" class="hover:text-indigo-600 hover:underline">最新公告</a>
+      <a href="#deals" class="hover:text-indigo-600 hover:underline">激安情報站</a>
       <a href="#about" class="hover:text-indigo-600 hover:underline">關於我們</a>
       <a href="#rule" class="hover:text-indigo-600 hover:underline">寄賣須知</a>
       <a href="#contact" class="hover:text-indigo-600 hover:underline">聯絡我們</a>
@@ -198,6 +199,7 @@
         label: '最新公告',
         summary: '最新消息與店舖公告。'
       },
+      { id: 'deals', label: '激安情報站', summary: '每天更新的免費與 7 折以下優惠。' },
       { id: 'about', label: '關於我們', summary: '關於本網站的背景故事。' },
       { id: 'rule', label: '寄賣須知', summary: '寄賣規則條件須知。' },
       { id: 'contact', label: '聯絡我們', summary: '聯絡方式資訊。' },
@@ -263,7 +265,7 @@
       contentTitle.textContent = item.label;
       contentBody.innerHTML = '<p class="loading">資料讀取中...</p>';
 
-      if (['announcement', 'about', 'rule', 'contact', 'privacy'].includes(item.id)) {
+      if (['announcement', 'deals', 'about', 'rule', 'contact', 'privacy'].includes(item.id)) {
         const fileName = item.id + '.html';
 
         // 加上時間戳記防止 LINE 快取舊檔案 (?v=...)
