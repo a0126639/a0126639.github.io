@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 本站為單頁 SPA（index.html + hash 切換，內容由 JS 載入 announcement/deals/about/rule/contact 片段）。
+       Google 只會索引根網址，片段 html 不單獨收錄，故 sitemap 僅列根網址。
+       若日後新增獨立內容頁（如部落格文章），再逐頁加入。 -->
+  <url>
+    <loc>https://a0126639.github.io/</loc>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
